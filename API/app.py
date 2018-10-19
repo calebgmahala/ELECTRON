@@ -1,4 +1,4 @@
-from flask import Flask, make_response, request, redirect, jsonif
+from flask import Flask, make_response, request, redirect, jsonify
 # using flask as api framework
 from flaskext.mysql import MySQL
 #used to pull mysql database
@@ -24,5 +24,13 @@ def leagues():
 		cur.execute("SELECT * FROM organizers")
 		org = cur.fetchall()
 		money = str(org[0][3])[:-2] + "." + str(org[0][3])[-2:] #change entry fee from cent int to string decimal (used to display in json)
-		resp = [org[0][0], org[0][1], org[0][2], money, org[0][4]] #change entry fee value to the string (had to make a new array because you can't change tuple value)
+		resp = []
+		for a in range(len(org)):
+			print(a)
+			resp.append([org[a][0], org[a][1], org[a][2], money, org[a][4]])#change entry fee value to the string (had to make a new array because you can't change tuple value)
 		return jsonify(resp)
+	elif request.method == 'POST':
+		body = json.dumps(request.form)
+		cur.execute('INSERT INTO leagues (name, entry_fee, desc) VALUES(%(name)s, %(entry_fee)s, %(desc)s)', json.loads(body))
+		conn.commit()
+		return redirect('localhost:5000/leagues', code=200)
