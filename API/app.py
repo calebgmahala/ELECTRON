@@ -27,7 +27,7 @@ def leagues():
 		resp = []
 		for a in range(len(org)):
 			print(a)
-			resp.append([org[a][0], org[a][1], org[a][2], money, org[a][4]])#change entry fee value to the string (had to make a new array because you can't change tuple value)
+			resp.append([org[a][0], org[a][1], org[a][2], money, org[a][4]])#change entry fee value to the string (had to make a new array because you can't change tuple values)
 		return jsonify(resp)
 	elif request.method == 'POST':
 		body = json.dumps(request.form)
