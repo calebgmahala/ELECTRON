@@ -98,16 +98,48 @@ header {
     border-radius: 3px; }
 
 .body {
+  width: 100%;
   position: absolute;
   top: 33%; }
   .body h1 {
     padding: 10px;
     color: black;
-    font-size: 20px; }
+    font-size: 40px;
+    font-weight: bold; }
+  .body h2 {
+    padding: 10px;
+    color: black;
+    font-size: 30px;
+    font-weight: bold; }
+  .body h3 {
+    padding: 5px;
+    color: black;
+    font-size: 25px;
+    font-weight: bold; }
+  .body p {
+    padding: 2px 2px 8px 2px;
+    color: black;
+    font-size: 16px; }
+  .body .money {
+    font-style: italic; }
 
 .table td, .table th {
-  padding: 5px;
-  border: 2px solid black;
+  padding: 8px;
+  border: 4px solid black;
   font-size: 20px; }
+.table th {
+  font-weight: bold;
+  font-size: 25px; }
+
+.card {
+  background-color: #CFBD8A;
+  border: 1px solid black;
+  display: inline-block;
+  width: auto;
+  padding: 20px;
+  box-shadow: 3px 5px lightgrey; }
+
+body {
+  background-color: #F4F4F4; }
 
 /*# sourceMappingURL=base.css.map */

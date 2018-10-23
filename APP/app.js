@@ -33,9 +33,9 @@ app.get('/leagues', function(req, res) {
 		for (var b in a) {
 			string = string + "<tr><td>"
 			string = string + a[b]['id'] + "</td><td>"
-			string = string + a[b]['name'] + "</td><td>"
+			string = string + "<a href='/leagues/" + a[b]['id'] + "'>" + a[b]['name'] + "</a></td><td>"
 			string = string + a[b]['owner_id'] + "</td><td>"
-			string = string + a[b]['entry_fee'] + "</td><td>"
+			string = string + "$" + a[b]['entry_fee'] + "</td><td>"
 			string = string + a[b]['desc'] + "</td></tr>"
 		}
 		return(string)
@@ -43,6 +43,15 @@ app.get('/leagues', function(req, res) {
 	// make an api call and on response render the html page.
 	CallApi('leagues', function(body){
 		res.render('leagues.html', {"table": Table(body), "title": "Leagues", "user": "Placeholder", "body": body})
+	})
+})
+
+// show one leagues
+app.get('/leagues/:id', function(req, res) {
+	// make an api call and on response render the html page.
+	CallApi('leagues/'+req.params['id'], function(body){
+		tbody = JSON.parse(body)
+		res.render('league.html', {"title": "League", "user": "Placeholder", "body": body, "name": tbody['name'], "owner": tbody['owner_id'], "desc": tbody['desc'], "entry_fee": tbody['entry_fee']})
 	})
 })
 

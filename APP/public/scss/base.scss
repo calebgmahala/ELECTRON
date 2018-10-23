@@ -2,3 +2,6 @@
 @import "vars";
 @import "header";
 @import "body";
+body {
+	background-color: $color-primary-1;
+}

@@ -1,8 +1,17 @@
-{{> head}}
+{{> _head}}
+<style>
+.title {
+	text-align: center;
+}
+.table {
+	margin: auto;
+	margin-top: 20px;
+}
+</style>
 <body>
-	{{> header}}
+	{{> _header}}
 	<div class="body">
-		<h1>Leagues</h1>
+		<h1 class="title">Leagues</h1>
 		<table class="table">
 			{{{table}}}
 		</table>

@@ -1,0 +1,21 @@
+{{> _head}}
+<style>
+.title {
+	text-align: center;
+}
+.card {
+	margin-left: 10%;
+}
+</style>
+<body>
+	{{> _header}}
+	<div class="body">
+		<h1 class="title">{{name}}</h1>
+		<div class="card">
+			<h3>{{owner}}</h3>
+			<p>{{desc}}</p>
+			<p class="money">${{entry_fee}}</p>
+		</div>
+	</div>
+</body>
+</html>
