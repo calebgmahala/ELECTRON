@@ -1,2 +1,11 @@
-<h1>This is a test</h1>
-<h2>{{body}}</h2>
+{{> head}}
+<body>
+	{{> header}}
+	<div class="body">
+		<h1>Leagues</h1>
+		<table class="table">
+			{{{table}}}
+		</table>
+	</div>
+</body>
+</html>

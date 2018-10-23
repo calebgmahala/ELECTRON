@@ -1,3 +1,5 @@
 node_modules/
 API/venv/
 *.xlsx
+.sass-cache/
+APP/public/colors.html
