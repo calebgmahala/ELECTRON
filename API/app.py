@@ -17,20 +17,29 @@ conn =  mysql.connect()
 cur = conn.cursor()
 
 #league routes
-@app.route("/leagues", methods=['GET'])
+@app.route("/leagues", methods=['GET', 'POST'])
 def leagues():
 	if request.method == 'GET':
 		# get all organizers
 		cur.execute("SELECT * FROM organizers")
 		org = cur.fetchall()
-		money = str(org[0][3])[:-2] + "." + str(org[0][3])[-2:] #change entry fee from cent int to string decimal (used to display in json)
 		resp = []
 		for a in range(len(org)):
-			print(a)
-			resp.append([org[a][0], org[a][1], org[a][2], money, org[a][4]])#change entry fee value to the string (had to make a new array because you can't change tuple value)
+			money = str(org[a][3])[:-2] + "." + str(org[a][3])[-2:] #change entry fee from cent int to string decimal (used to display in json)
+			resp.append({"id":org[a][0], "name":org[a][1], "owner_id":org[a][2], "entry_fee":money, "desc":org[a][4]}) # change entry fee value to the string (had to make a new array because you can't change tuple values)
 		return jsonify(resp)
 	elif request.method == 'POST':
 		body = json.dumps(request.form)
 		cur.execute('INSERT INTO leagues (name, entry_fee, desc) VALUES(%(name)s, %(entry_fee)s, %(desc)s)', json.loads(body))
 		conn.commit()
 		return redirect('localhost:5000/leagues', code=200)
+
+@app.route("/leagues/<int:id>", methods=['GET'])
+def showleague(id):
+	if request.method == 'GET':
+		# get organizer
+		cur.execute("SELECT * FROM organizers WHERE id=%d" % id)
+		org = cur.fetchone()
+		money = str(org[3])[:-2] + "." + str(org[3])[-2:] #change entry fee from cent int to string decimal (used to display in json)
+		resp = {"id":org[0], "name":org[1], "owner_id":org[2], "entry_fee":money, "desc":org[4]}
+		return jsonify(resp)

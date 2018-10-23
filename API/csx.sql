@@ -17,4 +17,6 @@ CREATE TABLE `organizers` (
   FOREIGN KEY (`owner_id`) REFERENCES `users`(`id`)
 );
 INSERT INTO `users` VALUES(1);
+INSERT INTO `users` VALUES(2);
 INSERT INTO `organizers` VALUES(1, 'Ignis', 1, 100, 'Best place to play!');
+INSERT INTO `organizers` VALUES(2, 'VGL', 2, 1000, 'Second Best place to play!');
