@@ -1,7 +1,9 @@
-from flask import Flask, make_response, request, redirect, jsonify
+from flask import Flask, make_response, request, redirect
 # using flask as api framework
 from flaskext.mysql import MySQL
 #used to pull mysql database
+import simplejson as json
+#used to decode and encode json
 import os
 
 #connect to mysql database
@@ -26,11 +28,14 @@ def leagues():
 		resp = []
 		for a in range(len(org)):
 			money = str(org[a][3])[:-2] + "." + str(org[a][3])[-2:] #change entry fee from cent int to string decimal (used to display in json)
-			resp.append({"id":org[a][0], "name":org[a][1], "owner_id":org[a][2], "entry_fee":money, "desc":org[a][4]}) # change entry fee value to the string (had to make a new array because you can't change tuple values)
-		return jsonify(resp)
+			resp.append({"id":org[a][0], "name":org[a][1], "owner_id":org[a][2], "entry_fee":money, "description":org[a][4]}) # change entry fee value to the string (had to make a new array because you can't change tuple values)
+		return json.dumps(resp)
 	elif request.method == 'POST':
 		body = json.dumps(request.form)
-		cur.execute('INSERT INTO leagues (name, entry_fee, desc) VALUES(%(name)s, %(entry_fee)s, %(desc)s)', json.loads(body))
+		body = json.loads(body)
+		body['entry_fee'] = int(body['entry_fee'])
+		print(body)
+		cur.execute('INSERT INTO organizers (name, entry_fee, owner_id, description) VALUES(%(name)s, %(entry_fee)s, 1, %(description)s)', body)
 		conn.commit()
 		return redirect('localhost:5000/leagues', code=200)
 
@@ -42,4 +47,4 @@ def showleague(id):
 		org = cur.fetchone()
 		money = str(org[3])[:-2] + "." + str(org[3])[-2:] #change entry fee from cent int to string decimal (used to display in json)
 		resp = {"id":org[0], "name":org[1], "owner_id":org[2], "entry_fee":money, "desc":org[4]}
-		return jsonify(resp)
+		return json.dumps(resp)

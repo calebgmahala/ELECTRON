@@ -12,7 +12,7 @@ CREATE TABLE `organizers` (
   `name` varchar(45) NOT NULL,
   `owner_id` int(11) NOT NULL,
   `entry_fee` int(10), -- money value in cents --
-  `desc` text,
+  `description` text,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`owner_id`) REFERENCES `users`(`id`)
 );
