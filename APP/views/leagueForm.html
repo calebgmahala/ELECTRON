@@ -1,0 +1,22 @@
+{{> _head}}
+<style>
+</style>
+<body>
+  {{> _header}}
+  <div class="body">
+    <form id='leagueForm'>
+      <div class="form-group">
+        <label for="name">Name</label>
+        <input name="name" type="text" id="name" placeholder="Enter name">
+      </div>
+      <div class="form-group">
+        <label for="entry_fee">Entry Fee</label>
+        <input name="entry_fee" type="number" id="entry_fee">
+      </div>
+      <textarea rows="4" cols="50" name="description" form="leagueForm">Description</textarea>
+      <button type="submit">Submit</button>
+    </form>
+  </div>
+  <script type="text/javascript" src="/scripts/{{file}}"></script>
+</body>
+</html
