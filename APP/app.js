@@ -51,13 +51,18 @@ app.get('/league/:id', function(req, res) {
 	// make an api call and on response render the html page.
 	CallApi('leagues/'+req.params['id'], function(body){
 		tbody = JSON.parse(body)
-		res.render('league.html', {"title": "League", "user": "Placeholder", "body": body, "name": tbody['name'], "owner": tbody['owner_id'], "description": tbody['description'], "entry_fee": tbody['entry_fee']})
+		res.render('league.html', {"title": "League", "user": "Placeholder", "body": body, "name": tbody['name'], "owner": tbody['owner_id'], "description": tbody['description'], "entry_fee": tbody['entry_fee'], "file": "deleteLeague.js"})
 	})
 })
 
 // new league
 app.get('/leagues/new', function(req, res) {
 	res.render('leagueForm.html', {"file": "newLeague.js"})
+})
+
+// edit league
+app.get('/league/:id/edit', function(req, res) {
+	res.render('leagueForm.html', {"file": "editLeague.js"})
 })
 
 app.listen(port)
