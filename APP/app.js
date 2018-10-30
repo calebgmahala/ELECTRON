@@ -65,4 +65,43 @@ app.get('/league/:id/edit', function(req, res) {
 	res.render('leagueForm.html', {"file": "editLeague.js"})
 })
 
+// show all teams
+app.get('/teams', function(req, res) {
+	// function to put together table for html page
+	function Table(a) {
+		a = JSON.parse(a)// turn a into object otherwise it is a string
+		string = "<tr><th>Id</th><th>Name</th><th>Owner</th><th>Description</th></tr>";
+		for (var b in a) {
+			string = string + "<tr><td>"
+			string = string + a[b]['id'] + "</td><td>"
+			string = string + "<a href='/team/" + a[b]['id'] + "'>" + a[b]['name'] + "</a></td><td>"
+			string = string + a[b]['owner_id'] + "</td><td>"
+			string = string + a[b]['description'] + "</td></tr>"
+		}
+		return(string)
+	}
+	// make an api call and on response render the html page.
+	CallApi('teams', function(body){
+		res.render('leagues.html', {"table": Table(body), "title": "Teams", "user": "Placeholder", "body": body})
+	})
+})
+
+// show one team
+// app.get('/team/:id', function(req, res) {
+// 	// make an api call and on response render the html page.
+// 	CallApi('teams/'+req.params['id'], function(body){
+// 		tbody = JSON.parse(body)
+// 		res.render('leagues.html', {"title": "League", "user": "Placeholder", "body": body, "name": tbody['name'], "owner": tbody['owner_id'], "description": tbody['description'], "file": "deleteLeague.js"})
+// 	})
+// })
+
+// new team
+app.get('/teams/new', function(req, res) {
+	res.render('teamForm.html', {"file": "newTeam.js"})
+})
+
+// edit league
+app.get('/team/:id/edit', function(req, res) {
+	res.render('teamForm.html', {"file": "editTeam.js"})
+})
 app.listen(port)

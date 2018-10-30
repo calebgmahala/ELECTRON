@@ -75,13 +75,13 @@ def showleague(id):
 			print(err)
 			return Response(status=404)
 	elif request.method == 'DELETE':
-		try:
+		cur.execute('SELECT * FROM organizers WHERE id=%d' % id)
+		if (cur.fetchone() is None):
+			return Response(status=404)
+		else:
 			cur.execute('DELETE FROM organizers WHERE id=%d' % id )
 			conn.commit()
-			return Response(status=200)
-		except (mysql.connector.Error) as err:
-			print(err)
-			return Response(status=404)
+			return Response(status=200)	
 
 #team routes
 @app.route("/teams", methods=['GET', 'POST'])
@@ -134,10 +134,10 @@ def showteam(id):
 			print(err)
 			return Response(status=404)
 	elif request.method == 'DELETE':
-		try:
+		cur.execute('SELECT * FROM teams WHERE id=%d' % id)
+		if (cur.fetchone() is None):
+			return Response(status=404)
+		else:
 			cur.execute('DELETE FROM teams WHERE id=%d' % id )
 			conn.commit()
-			return Response(status=200)
-		except (mysql.connector.Error) as err:
-			print(err)
-			return Response(status=404)
+			return Response(status=200)			
