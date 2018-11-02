@@ -33,6 +33,16 @@ class Requests(unittest.TestCase):
         r = requests.get(url + 'leagues/1')
         self.assertEqual(result, r.json())
 
+    def test_get_league_tournaments(self):
+        result = [{"id": 1, "organizer_id": 1, "name": "New Year", "type": 2, "size": 8, "start_date": "2018-01-01 08:00:00", "end_date": "2018-01-20", "entry_fee": "1000.00", "description": "New year special"}, {"id": 2, "organizer_id": 1, "name": "Christmas", "type": 1, "size": 4, "start_date": "2018-12-25 12:30:00", "end_date": None, "entry_fee": "5.00", "description": "Christmas special"}]
+        r = requests.get(url + 'leagues/1/tournaments')
+        self.assertEqual(result, r.json())
+
+    def test_get_league_teams(self):
+        result = [{"id": 1, "name": "FuRy", "owner_id": 1, "description": "Andrew is a god"}, {"id": 2, "name": "Artemis", "owner_id": 2, "description": "Not your average expieriance"}, {"id": 3, "name": "Faze", "owner_id": 2, "description": "Olof is a criminal"}, {"id": 4, "name": "Outer Heavan", "owner_id": 1, "description": "... wtf"}]
+        r = requests.get(url + 'leagues/1/teams')
+        self.assertEqual(result, r.json())
+
     def test_post_league(self):
         r = requests.post(url + 'leagues', data={"name": "Test", "owner_id": 1, "entry_fee": 1000, "description": "Test"})
         self.assertEqual(200, r.status_code)

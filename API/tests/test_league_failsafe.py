@@ -24,6 +24,8 @@ class FailRequests(unittest.TestCase):
         conn.commit()
 
     def test_fail_get_league(self):
+        cur.execute('DELETE FROM `organizers_teams` WHERE 1=1;')
+        cur.execute('DELETE FROM `tournaments` WHERE 1=1;')
         cur.execute('DELETE FROM `organizers` WHERE 1=1;')
         conn.commit()
         r = requests.get(url + 'leagues/1')
@@ -34,12 +36,16 @@ class FailRequests(unittest.TestCase):
         self.assertEqual(404, r.status_code)
 
     def test_fail_edit_league(self):
+        cur.execute('DELETE FROM `organizers_teams` WHERE 1=1;')
+        cur.execute('DELETE FROM `tournaments` WHERE 1=1;')
         cur.execute('DELETE FROM `organizers` WHERE 1=1;')
         conn.commit()
         r = requests.put(url + 'leagues/1', data={"owner_id": 1, "description": "Test"})
         self.assertEqual(404, r.status_code)
 
     def test_fail_delete_league(self):
+        cur.execute('DELETE FROM `organizers_teams` WHERE 1=1;')
+        cur.execute('DELETE FROM `tournaments` WHERE 1=1;')
         cur.execute('DELETE FROM `organizers` WHERE 1=1;')
         conn.commit()
         r = requests.delete(url + 'leagues/1')
