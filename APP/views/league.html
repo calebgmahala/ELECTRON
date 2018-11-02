@@ -3,21 +3,34 @@
 .title {
 	text-align: center;
 }
-.card {
-	margin-left: 10%;
+.cardHolder {
+	display: flex;
+	justify-content: space-between;
+	padding-left: 10%;
+	padding-right: 10%;
+}
+.table {
+	margin: auto;
+	margin-top: 20px;
 }
 </style>
 <body>
 	{{> _header}}
 	<div class="body">
 		<h1 class="title">{{name}}</h1>
-		<div class="card">
-			<h3>Information</h3>
-			<p>Owner: {{owner}}</p>
-			<p>{{desc}}</p>
-			<p class="money">${{entry_fee}}</p>
-			<input type="button" value="Delete" onclick="remove()">
+		<div class="cardHolder">
+			<div class="card">
+				<h3>Information</h3>
+				<p>Owner: {{owner}}</p>
+				<p>{{description}}</p>
+				<p class="money">${{entry_fee}}</p>
+				<input type="button" value="Delete" onclick="remove()">
+			</div>
+			{{{tournaments}}}
 		</div>
+		<table class="table">
+			{{{teams}}}
+		</table>
 	</div>
 	<script type="text/javascript" src="/scripts/{{file}}"></script>
 </body>
