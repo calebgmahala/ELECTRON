@@ -43,6 +43,15 @@ class Requests(unittest.TestCase):
         r = requests.get(url + 'leagues/1/teams')
         self.assertEqual(result, r.json())
 
+    def test_get_league_teams_requests(self):
+        result = [{"id": 2, "name": "Artemis", "owner_id": 2, "description": "Not your average expieriance"}]
+        r = requests.get(url + 'leagues/2/teams/requests')
+        self.assertEqual(result, r.json())
+
+    def test_post_team_leagues(self):
+        r = requests.get(url + 'leagues/1/teams', data={"organizer_id":2, "team_id":3})
+        self.assertEqual(200, r.status_code)
+
     def test_post_league(self):
         r = requests.post(url + 'leagues', data={"name": "Test", "owner_id": 1, "entry_fee": 1000, "description": "Test"})
         self.assertEqual(200, r.status_code)
@@ -54,9 +63,21 @@ class Requests(unittest.TestCase):
         self.assertEqual(200, r.status_code)
         self.assertEqual(result, r2.json())
 
+    def test_edit_league_teams(self):
+        r = requests.put(url + 'leagues/2/teams/2', data={"request": 0})
+        r2 = requests.get(url + 'leagues/2/teams/requests')
+        self.assertEqual(200, r.status_code)
+        self.assertEqual([], r2.json())
+
     def test_delete_league(self):
         r = requests.delete(url + 'leagues/1')
         r2 = requests.get(url + 'leagues/1')
+        self.assertEqual(200, r.status_code)
+        self.assertEqual(404, r2.status_code)
+
+    def test_delete_team_leagues(self):
+        r = requests.delete(url + 'leagues/1/teams/1')
+        r2 = requests.get(url + 'leagues/1/teams/1')
         self.assertEqual(200, r.status_code)
         self.assertEqual(404, r2.status_code)
 

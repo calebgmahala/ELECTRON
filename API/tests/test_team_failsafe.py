@@ -30,6 +30,12 @@ class FailRequests(unittest.TestCase):
         r = requests.get(url + 'teams/1')
         self.assertEqual(404, r.status_code)
 
+    def test_fail_get_team_leagues(self):
+        cur.execute('DELETE FROM `organizers_teams` WHERE 1=1;')
+        conn.commit()
+        r = requests.get(url + 'teams/8/leagues')
+        self.assertEqual(404, r.status_code)
+
     def test_fail_post_team(self):
         r = requests.post(url + 'teams', data={"owner_id": 1, "description": "Test"})
         self.assertEqual(404, r.status_code)
