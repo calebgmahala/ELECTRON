@@ -31,6 +31,22 @@ class FailRequests(unittest.TestCase):
         r = requests.get(url + 'leagues/1')
         self.assertEqual(404, r.status_code)
 
+    def test_fail_get_league_tournaments(self):
+        cur.execute('DELETE FROM `tournaments` WHERE 1=1;')
+        conn.commit()
+        r = requests.get(url + 'leagues/4/tournaments')
+        self.assertEqual(404, r.status_code)
+
+    def test_fail_get_league_teams(self):
+        cur.execute('DELETE FROM `organizers_teams` WHERE 1=1;')
+        conn.commit()
+        r = requests.get(url + 'leagues/4/teams')
+        self.assertEqual(404, r.status_code)
+
+    def test_fail_post_team_leagues(self):
+        r = requests.post(url + 'leagues/1/teams', data={"organizer_id":7, "team_id":6 })
+        self.assertEqual(404, r.status_code)
+
     def test_fail_post_league(self):
         r = requests.post(url + 'leagues', data={"owner_id": 1, "description": "Test"})
         self.assertEqual(404, r.status_code)
@@ -49,6 +65,13 @@ class FailRequests(unittest.TestCase):
         cur.execute('DELETE FROM `organizers` WHERE 1=1;')
         conn.commit()
         r = requests.delete(url + 'leagues/1')
+        self.assertEqual(404, r.status_code)
+
+    def test_fail_delete_team_leagues(self):
+        cur.execute('DELETE FROM `organizers_teams` WHERE 1=1;')
+        cur.execute('DELETE FROM `teams` WHERE 1=1;')
+        conn.commit()
+        r = requests.delete(url + 'leagues/1/teams/1')
         self.assertEqual(404, r.status_code)
 
 if __name__ == '__main__':

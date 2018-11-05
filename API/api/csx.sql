@@ -46,6 +46,7 @@ CREATE TABLE `organizers_teams` (
 	`id` int(11) NOT NULL AUTO_INCREMENT,
     `organizer_id` int(11) NOT NULL,
     `team_id` int(11) NOT NULL,
+    `request` int(1) NOT NULL DEFAULT 1,
     PRIMARY KEY (`id`),
     FOREIGN KEY (`organizer_id`) REFERENCES `organizers`(`id`),
     FOREIGN KEY (`team_id`) REFERENCES `teams`(`id`)
@@ -94,6 +95,7 @@ CREATE TABLE `organizers_teams` (
 	`id` int(11) NOT NULL AUTO_INCREMENT,
     `organizer_id` int(11) NOT NULL,
     `team_id` int(11) NOT NULL,
+    `request` int(1) NOT NULL DEFAULT 1,
     PRIMARY KEY (`id`),
     FOREIGN KEY (`organizer_id`) REFERENCES `organizers`(`id`),
     FOREIGN KEY (`team_id`) REFERENCES `teams`(`id`)

@@ -43,8 +43,9 @@
 .card {
 	background-color: $color-secondary-1-2;
 	border: 1px solid black;
+	margin-top: 10px;
 	display: inline-block;
-	width: auto;
+	width: 200px;
 	padding: 20px;
 	box-shadow: 3px 5px lightgrey;
 }

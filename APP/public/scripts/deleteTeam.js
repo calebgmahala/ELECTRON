@@ -1,4 +1,4 @@
-function remove() {
+function removeTeam() {
   id = window.location.pathname.split('/')[2]
   $.ajax({
     type: "DELETE",

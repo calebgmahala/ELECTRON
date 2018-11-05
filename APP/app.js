@@ -56,23 +56,36 @@ app.get('/league/:id', function(req, res) {
 		a = JSON.parse(a)// turn a into object otherwise it is a string
 		string = "";
 		for (var b in a) {
-			string = string + "<div class='card'><h3>Tournaments</h3>";
-			string = string + "<a href='/tournament/" + a[b]['id'] + "'>" + a[b]['name'] + "</a></td><td>"
+			string = string + "<div class='card'><h3><a href='/tournament/" + a[b]['id'] + "'>" + a[b]['name'] + "</a></h3>";
 			string = string + "<p>" + a[b]['description'] + "</p>"
 			string = string + "<p>$" + a[b]['entry_fee'] + "</p></div>"
 		}
 		return(string)
 	}
 	//function to make team table
-	function Table(a) {
+	function TeamsTable(a) {
 		a = JSON.parse(a)// turn a into object otherwise it is a string
-		string = "<tr><th>Id</th><th>Name</th><th>Owner</th><th>Description</th></tr>";
+		string = "<tr><th>Id</th><th>Name</th><th>Owner</th><th>Description</th><th>Actions</th></tr>";
 		for (var b in a) {
 			string = string + "<tr><td>"
 			string = string + a[b]['id'] + "</td><td>"
 			string = string + "<a href='/teams/" + a[b]['id'] + "'>" + a[b]['name'] + "</a></td><td>"
 			string = string + a[b]['owner_id'] + "</td><td>"
-			string = string + a[b]['description'] + "</td></tr>"
+			string = string + a[b]['description'] + "</td><td>"
+			string = string + "<button type=button value=" + a[b]['id'] + " onclick=removeLeagueTeam()>Kick</button></td></tr>"
+		}
+		return(string)
+	}
+	function RequestsTable(a) {
+		a = JSON.parse(a)// turn a into object otherwise it is a string
+		string = "<tr><th>Id</th><th>Name</th><th>Owner</th><th>Description</th><th>Actions</th></tr>";
+		for (var b in a) {
+			string = string + "<tr><td>"
+			string = string + a[b]['id'] + "</td><td>"
+			string = string + "<a href='/teams/" + a[b]['id'] + "'>" + a[b]['name'] + "</a></td><td>"
+			string = string + a[b]['owner_id'] + "</td><td>"
+			string = string + a[b]['description'] + "</td><td>"
+			string = string + "<button type=button value=" + a[b]['id'] + " onclick=removeLeagueTeam()>Reject</button><button type=button value=" + a[b]['id'] + " onclick=editLeagueTeam()>Accept</button></td></tr>"
 		}
 		return(string)
 	}
@@ -80,19 +93,20 @@ app.get('/league/:id', function(req, res) {
 	CallApi('leagues/'+req.params['id']).then(function(leagues) {
 		CallApi('leagues/'+req.params['id']+'/tournaments').then(function(tournaments) {
 			CallApi('leagues/'+req.params['id']+'/teams').then(function(teams) {
-				leagues = JSON.parse(leagues)
-				res.render('league.html', {
-					"title": "League", 
-					"user": "Placeholder", 
-					"body": leagues, 
-					"name": leagues['name'], 
-					"owner": leagues['owner_id'], 
-					"description": leagues['description'], 
-					"entry_fee": leagues['entry_fee'], 
-					"tournaments": Card(tournaments),
-					"teams": Table(teams),
-					"file": "deleteLeague.js",
-					"file1": "deleteTournament"
+				CallApi('leagues/'+req.params['id']+'/teams/requests').then(function(requests) {
+					leagues = JSON.parse(leagues)
+					res.render('league.html', {
+						"title": "League", 
+						"user": "Placeholder", 
+						"body": leagues, 
+						"name": leagues['name'], 
+						"owner": leagues['owner_id'], 
+						"description": leagues['description'], 
+						"entry_fee": leagues['entry_fee'], 
+						"tournaments": Card(tournaments),
+						"teams": TeamsTable(teams),
+						"teams_request": RequestsTable(requests),
+					})
 				})
 			})
 		})
