@@ -120,7 +120,6 @@ def showLeagueTeams(id):
 		keys = [
 			'id',
 			'name',
-			'owner_id',
 			'description'
 			]
 		resp = []
@@ -264,7 +263,6 @@ def teams():
 		keys = [
 			'id',
 			'name',
-			'owner_id',
 			'description'
 			]
 		for a in range(len(team)):
@@ -276,7 +274,7 @@ def teams():
 		body = json.dumps(request.form)
 		body = json.loads(body)
 		try: 
-			cur.execute('INSERT INTO teams (name, owner_id, description) VALUES(%(name)s, 1, %(description)s)', body)
+			cur.execute('INSERT INTO teams (name, description) VALUES(%(name)s, %(description)s)', body)
 			conn.commit()
 			return Response(status=200)
 		except (mysql.connector.Error, KeyError) as err:
@@ -292,7 +290,6 @@ def showTeam(id):
 		keys = [
 			'id',
 			'name',
-			'owner_id',
 			'description'
 			]
 		resp = {}
@@ -307,7 +304,7 @@ def showTeam(id):
 		body = json.loads(body)
 		body['id'] = id
 		try:
-			cur.execute('UPDATE teams SET name = %(name)s, owner_id = 1, description = %(description)s WHERE id=%(id)s', body)
+			cur.execute('UPDATE teams SET name = %(name)s, description = %(description)s WHERE id=%(id)s', body)
 			conn.commit()
 			return Response(status=200)
 		except (mysql.connector.Error, KeyError) as err:

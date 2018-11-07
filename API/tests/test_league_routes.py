@@ -39,12 +39,12 @@ class Requests(unittest.TestCase):
         self.assertEqual(result, r.json())
 
     def test_get_league_teams(self):
-        result = [{"id": 1, "name": "FuRy", "owner_id": 1, "description": "Andrew is a god"}, {"id": 2, "name": "Artemis", "owner_id": 2, "description": "Not your average expieriance"}, {"id": 3, "name": "Faze", "owner_id": 2, "description": "Olof is a criminal"}, {"id": 4, "name": "Outer Heavan", "owner_id": 1, "description": "... wtf"}]
+        result = [{"id": 1, "name": "FuRy", "description": "Andrew is a god"}, {"id": 2, "name": "Artemis", "description": "Not your average expieriance"}, {"id": 3, "name": "Faze", "description": "Olof is a criminal"}, {"id": 4, "name": "Outer Heavan", "description": "... wtf"}]
         r = requests.get(url + 'leagues/1/teams')
         self.assertEqual(result, r.json())
 
     def test_get_league_teams_requests(self):
-        result = [{"id": 2, "name": "Artemis", "owner_id": 2, "description": "Not your average expieriance"}]
+        result = [{"id": 2, "name": "Artemis", "description": "Not your average expieriance"}]
         r = requests.get(url + 'leagues/2/teams/requests')
         self.assertEqual(result, r.json())
 

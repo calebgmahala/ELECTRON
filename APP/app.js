@@ -13,6 +13,10 @@ app.engine('html', mustache())
 app.set('view engine', 'html')
 app.set('views', __dirname + '/views')
 
+// sesions
+var session = require('express-session');
+app.use(session({secret: "I play pokemon go everyday", resave: false, saveUninitialized: true,}));
+
 //  api request function
 function CallApi(a) {
 	var resp = ''
@@ -26,6 +30,11 @@ function CallApi(a) {
 		})
 	})
 }
+
+// signup
+app.get('/login', function(req, res) {
+
+})
 
 // show all leagues
 app.get('/leagues', function(req, res) {
@@ -72,7 +81,7 @@ app.get('/league/:id', function(req, res) {
 			string = string + "<a href='/teams/" + a[b]['id'] + "'>" + a[b]['name'] + "</a></td><td>"
 			string = string + a[b]['owner_id'] + "</td><td>"
 			string = string + a[b]['description'] + "</td><td>"
-			string = string + "<button type=button value=" + a[b]['id'] + " onclick=removeLeagueTeam()>Kick</button></td></tr>"
+			string = string + "<button type=button value=" + a[b]['id'] + " class='removeLeagueTeam'>Kick</button></td></tr>"
 		}
 		return(string)
 	}
@@ -85,7 +94,7 @@ app.get('/league/:id', function(req, res) {
 			string = string + "<a href='/teams/" + a[b]['id'] + "'>" + a[b]['name'] + "</a></td><td>"
 			string = string + a[b]['owner_id'] + "</td><td>"
 			string = string + a[b]['description'] + "</td><td>"
-			string = string + "<button type=button value=" + a[b]['id'] + " onclick=removeLeagueTeam()>Reject</button><button type=button value=" + a[b]['id'] + " onclick=editLeagueTeam()>Accept</button></td></tr>"
+			string = string + "<button type=button value=" + a[b]['id'] + " class='removeLeagueTeam'>Reject</button><button type=button value=" + a[b]['id'] + " class='editLeagueTeam'>Accept</button></td></tr>"
 		}
 		return(string)
 	}
