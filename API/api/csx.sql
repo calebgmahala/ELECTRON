@@ -17,11 +17,13 @@ CREATE TABLE `teams` (
 CREATE TABLE `users` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
     `username` varchar(45) NOT NULL,
-    `password` varchar(45) NOT NULL,
-    `team_id` int(11) NOT NULL,
-    `is_owner_team` boolean NOT NULL DEFAULT false,
+    `password` varchar(64) NOT NULL,
+    `request_key` varchar(64),
+    `team_id` int(11),
+    `is_owner_team` int(1) NOT NULL DEFAULT 0,
     `description` text,
     `role` int(2),
+    UNIQUE (`username`),
     PRIMARY KEY (`id`),
     FOREIGN KEY (`team_id`) REFERENCES `teams`(`id`)
 );
@@ -71,11 +73,13 @@ CREATE TABLE `teams` (
 CREATE TABLE `users` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
     `username` varchar(45) NOT NULL,
-    `password` varchar(45) NOT NULL,
-    `team_id` int(11) NOT NULL,
-    `is_owner_team` boolean NOT NULL DEFAULT false,
+    `password` varchar(64) NOT NULL,
+    `request_key` varchar(64),
+    `team_id` int(11),
+    `is_owner_team` int(1) NOT NULL DEFAULT 0,
     `description` text,
     `role` int(11),
+    UNIQUE (`username`),
     PRIMARY KEY (`id`),
     FOREIGN KEY (`team_id`) REFERENCES `teams`(`id`)
 );

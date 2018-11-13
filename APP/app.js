@@ -8,14 +8,17 @@ const port = 3000
 const request = require('request')
 
 // mustache is template handler
-var mustache = require('mustache-express')
+const mustache = require('mustache-express')
 app.engine('html', mustache())
 app.set('view engine', 'html')
 app.set('views', __dirname + '/views')
 
 // sesions
-var session = require('express-session');
-app.use(session({secret: "I play pokemon go everyday", resave: false, saveUninitialized: true,}));
+const session = require('express-session');
+const bodyParser = require('body-parser');
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+app.use(session({secret: "I play pokemon go everyday", resave: false, saveUninitialized: true}));
 
 //  api request function
 function CallApi(a) {
@@ -23,7 +26,7 @@ function CallApi(a) {
 	return new Promise(function(resolve, reject){
 	    request('http://localhost:5000/'+a, function (error, response, body) {
 	    	if (!error && response.statusCode == 200) {	
-	    		resolve(body)// callback function passed from route
+	    		resolve(body)
 	  		} else {
 	  			reject(Error(error + " | " + response + " | " + body))
 	  		}
@@ -31,11 +34,53 @@ function CallApi(a) {
 	})
 }
 
-// signup
+// login and users
 app.get('/login', function(req, res) {
-
+	res.render('login.html', {'file': 'login.js'})
 })
 
+app.post('/login', function(req, res) {
+	var body = req.body
+    request({
+    	method: 'POST',
+    	url: 'http://localhost:5000/login',
+    	form: body,
+    	json: true}, function(error, response, body){
+		if (!error && response.statusCode == 200) {
+    		req.session.user = body['username']
+    		req.session.key = body['request_key']
+			res.sendStatus(200) 
+  		} else {
+  			res.sendStatus(404)
+  		}
+	});
+})
+
+app.get('/signup', function(req, res) {
+	res.render('login.html', {"user": req.session.user, "file": "signup.js"})
+})
+
+app.get('/users', function(req, res) {
+	// function to put together table for html page
+	function Table(a) {
+		a = JSON.parse(a)// turn a into object otherwise it is a string
+		string = "<tr><th>Id</th><th>Username</th><th>Team Id</th><th>Is Owner of Team?</th><th>Description</th><th>role</th></tr>";
+		for (var b in a) {
+			string = string + "<tr><td>"
+			string = string + a[b]['id'] + "</td><td>"
+			string = string + "<a href='/user/" + a[b]['id'] + "'>" + a[b]['username'] + "</td><td>"
+			string = string + "<a href='/team/" + a[b]['team_id'] + "'>" + a[b]['team_id'] + "</a></td><td>"
+			string = string + a[b]['is_owner_team'] + "</td><td>"
+			string = string + a[b]['description'] + "</td><td>"
+			string = string + a[b]['role'] + "</td></tr>"
+		}
+		return(string)
+	}
+	// make an api call and on response render the html page.
+	CallApi('users').then(function(value) {
+		res.render('leagues.html', {"table": Table(value), "title": "Users", "user": req.session.user, "body": value})
+	})
+})
 // show all leagues
 app.get('/leagues', function(req, res) {
 	// function to put together table for html page
@@ -54,7 +99,7 @@ app.get('/leagues', function(req, res) {
 	}
 	// make an api call and on response render the html page.
 	CallApi('leagues').then(function(value) {
-		res.render('leagues.html', {"table": Table(value), "title": "Leagues", "user": "Placeholder", "body": value})
+		res.render('leagues.html', {"table": Table(value), "title": "Leagues", "user": req.session.user, "body": value})
 	})
 })
 
@@ -115,6 +160,7 @@ app.get('/league/:id', function(req, res) {
 						"tournaments": Card(tournaments),
 						"teams": TeamsTable(teams),
 						"teams_request": RequestsTable(requests),
+						"user": req.session.user,
 					})
 				})
 			})
@@ -124,12 +170,12 @@ app.get('/league/:id', function(req, res) {
 
 // new league
 app.get('/leagues/new', function(req, res) {
-	res.render('leagueForm.html', {"file": "newLeague.js"})
+	res.render('leagueForm.html', {"user": req.session.user, "file": "newLeague.js"})
 })
 
 // edit league
 app.get('/league/:id/edit', function(req, res) {
-	res.render('leagueForm.html', {"file": "editLeague.js"})
+	res.render('leagueForm.html', {"user": req.session.user, "file": "editLeague.js"})
 })
 
 // show all teams
@@ -149,7 +195,7 @@ app.get('/teams', function(req, res) {
 	}
 	// make an api call and on response render the html page.
 	CallApi('teams').then(function(body){
-		res.render('leagues.html', {"table": Table(body), "title": "Teams", "user": "Placeholder", "body": body})
+		res.render('leagues.html', {"table": Table(body), "title": "Teams", "user": req.session.user, "body": body})
 	})
 })
 
@@ -164,11 +210,12 @@ app.get('/teams', function(req, res) {
 
 // new team
 app.get('/teams/new', function(req, res) {
-	res.render('teamForm.html', {"file": "newTeam.js"})
+	res.render('teamForm.html', {"user": req.session.user, "file": "newTeam.js"})
 })
 
 // edit league
 app.get('/team/:id/edit', function(req, res) {
-	res.render('teamForm.html', {"file": "editTeam.js"})
+	res.render('teamForm.html', {"user": req.session.user, "file": "editTeam.js"})
 })
+
 app.listen(port)

@@ -69,6 +69,9 @@ class FailRequests(unittest.TestCase):
 
     def test_fail_delete_team_leagues(self):
         cur.execute('DELETE FROM `organizers_teams` WHERE 1=1;')
+        cur.execute('DELETE FROM `tournaments` WHERE 1=1;')
+        cur.execute('DELETE FROM `organizers` WHERE 1=1;')
+        cur.execute('DELETE FROM `users` WHERE 1=1;')
         cur.execute('DELETE FROM `teams` WHERE 1=1;')
         conn.commit()
         r = requests.delete(url + 'leagues/1/teams/1')

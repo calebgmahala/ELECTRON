@@ -7,6 +7,10 @@ from flask_cors import CORS, cross_origin
 import simplejson as json
 #used to decode and encode json
 import os
+#used for encryption and key generation
+import bcrypt
+import string
+import random
 
 app = Flask(__name__)
 app.config['TEMPLATES_AUTO_RELOAD'] = True
@@ -18,37 +22,173 @@ def connect_db():
 	return mysql.connector.connect(user='root', database=env, host='localhost')
 
 #show results function
-def show_results(keys, obj, resp, respit=None):
+def show_results(keys, obj, resp, respit=None, notkeys=[]):
 	for b in range(len(keys)):
 		if respit is None :
-			obj[keys[b]] = resp[b]
-		else:	
-			obj[keys[b]] = resp[respit][b]
+			if keys[b] not in notkeys:
+				obj[keys[b]] = resp[b]
+		else:
+			if keys[b] not in notkeys:
+				obj[keys[b]] = resp[respit][b]
+
+# put post function
+def put_post(var, notkeys, inserts, putpost):
+	if putpost == 'POST':
+		keys = '('
+		value = ") VALUES("
+		for i in range(len(var)):
+			if var[i] not in notkeys:
+				keys = keys + var[i] + ", "
+				value = value + "'" + str(inserts[var[i]]) + "', "
+		resp = keys[:-2] + value[:-2] + ")"
+		return(resp)
+	elif putpost == 'PUT':
+		value = ''
+		for i in range(len(var)):
+			if var[i] not in notkeys:
+				value = value + str(var[i]) + " = '" + str(inserts[var[i]]) + "', "
+		resp = value[:-2]
+		return(resp)
+
+# gen key function
+# credits to https://stackoverflow.com/questions/2257441/random-string-generation-with-upper-case-letters-and-digits-in-python
+def key_gen(size=12, chars=string.ascii_uppercase + string.digits + string.ascii_lowercase):
+	return ''.join(random.choice(chars) for _ in range(size))
 
 #set connection and cursor variables\
 conn = connect_db()
 cur = conn.cursor()
 
+#keys for tables
+league_keys = [
+	'id',
+	'name',
+	'owner_id',
+	'entry_fee',
+	'description']
+team_keys = [
+	'id',
+	'name',
+	'description']
+organizer_team_keys = [
+	'id',
+	'organizer_id',
+	'team_id',
+	'request']
+tournament_keys = [
+	'id',
+	'organizer_id',
+	'name',
+	'type',
+	'size',
+	'start_date',
+	'end_date',
+	'entry_fee',
+	'description']
+user_keys = [
+	'id',
+	'username',
+	'password',
+	'request_key',
+	'team_id',
+	'is_owner_team',
+	'description',
+	'role']
+
+#users routes
+@app.route("/users", methods=['GET', 'POST'])
+def Users():
+	conn.commit() # allows reload for testing otherwise database is not refreshed
+	if request.method == 'GET':
+		# get all users
+		resp = []
+		cur.execute("SELECT * FROM users")
+		usr = cur.fetchall()
+		for a in range(len(usr)):
+			obj = {}
+			show_results(user_keys, obj, usr, a, ['password', 'request_key'])
+			resp.append(obj)
+		return json.dumps(resp)
+	elif request.method == 'POST':
+		body = json.dumps(request.form)
+		body = json.loads(body)
+		try: 
+			body['password'] = bcrypt.hashpw( body['password'].encode("utf-8"), bcrypt.gensalt()).decode('utf-8')
+			cur.execute('INSERT INTO users ' + put_post(user_keys, ['id', 'request_key', 'team_id', 'is_owner_team', 'description', 'role'], body, 'POST'))
+			conn.commit()
+			return Response(status=200)
+		except (mysql.connector.Error, KeyError) as err:
+			return Response(status=404)
+
+@app.route("/users/<int:id>", methods=['GET', 'PUT', 'DELETE'])
+def User(id):
+	conn.commit() # allows reload for testing otherwise database is not refreshed
+	if request.method == 'GET':
+		# get user
+		cur.execute("SELECT * FROM users WHERE id=%d" % id)
+		usr = cur.fetchone()
+		resp = {}
+		if (usr is None):
+			resp = Response(status=404)
+			return resp
+		else:
+			show_results(user_keys, resp, usr, notkeys=['password', 'request_key'])
+			return json.dumps(resp)
+	# elif request.method == 'PUT':
+	# 	body = json.dumps(request.form)
+	# 	body = json.loads(body)
+	# 	body['id'] = id
+	# 	try:
+	# 		body['entry_fee'] = int(body['entry_fee'])
+	# 		cur.execute('UPDATE organizers SET ' + put_post(league_keys, ['id'], body, 'PUT') + ' WHERE id=' + str(body['id']))
+	# 		conn.commit()
+	# 		return Response(status=200)
+	# 	except (mysql.connector.Error, KeyError) as err:
+	# 		return Response(status=404)
+	elif request.method == 'DELETE':
+		cur.execute('SELECT * FROM users WHERE id=%d' % id)
+		if (cur.fetchone() is None):
+			return Response(status=404)
+		else:
+			cur.execute('DELETE FROM organizers_teams WHERE organizer_id=%d' % id)
+			cur.execute('DELETE FROM tournaments WHERE organizer_id=%d' % id )			
+			cur.execute('DELETE FROM organizers WHERE id=%d' % id )
+			cur.execute('DELETE FROM users WHERE id=%d' % id )
+			conn.commit()
+			return Response(status=200)	
+
+@app.route("/login", methods=['POST'])
+def Login():
+	body = json.dumps(request.form)
+	body = json.loads(body)
+	cur.execute("SELECT * FROM users WHERE username='" + str(body['username']) + "'")
+	usr = cur.fetchone()
+	resp = {}
+	if (usr is None or not bcrypt.checkpw(body['password'].encode("utf-8"), usr[2].encode("utf-8"))):
+		resp = Response(status=404)
+		return resp
+	else:
+		show_results(user_keys, resp, usr, notkeys=['password', 'description', 'team_id', 'request_key', 'is_owner_team', 'role'])
+		key = key_gen()
+		resp['request_key'] = key
+		hashedkey = bcrypt.hashpw( key.encode("utf-8"), bcrypt.gensalt()).decode('utf-8')
+		cur.execute("UPDATE users SET request_key='" + str(hashedkey) + "' WHERE id=" + str(resp['id']))
+		conn.commit()
+		return json.dumps(resp)
+
 #league routes
 @app.route("/leagues", methods=['GET', 'POST'])
-def leagues():
+def Leagues():
 	conn.commit() # allows reload for testing otherwise database is not refreshed
 	if request.method == 'GET':
 		# get all organizers
 		resp = []
 		cur.execute("SELECT * FROM organizers")
 		org = cur.fetchall()
-		keys = [
-			'id',
-			'name',
-			'owner_id',
-			'entry_fee',
-			'description'
-			]
 		for a in range(len(org)):
-			money = str(org[a][3])[:-2] + "." + str(org[a][3])[-2:] #change entry fee from cent int to string decimal (used to display in json)
 			obj = {}
-			show_results(keys, obj, org, a)
+			show_results(league_keys, obj, org, a)
+			money = str(obj['entry_fee'])[:-2] + "." + str(obj['entry_fee'])[-2:] #change entry fee from cent int to string decimal (used to display in json)
 			obj['entry_fee'] = money
 			resp.append(obj)
 		return json.dumps(resp)
@@ -57,33 +197,26 @@ def leagues():
 		body = json.loads(body)
 		try: 
 			body['entry_fee'] = int(body['entry_fee'])
-			cur.execute('INSERT INTO organizers (name, entry_fee, owner_id, description) VALUES(%(name)s, %(entry_fee)s, 1, %(description)s)', body)
+			cur.execute('INSERT INTO organizers ' + put_post(league_keys, ['id'], body, 'POST'))
 			conn.commit()
 			return Response(status=200)
 		except (mysql.connector.Error, KeyError) as err:
 			return Response(status=404)
 
 @app.route("/leagues/<int:id>", methods=['GET', 'PUT', 'DELETE'])
-def showLeague(id):
+def League(id):
 	conn.commit() # allows reload for testing otherwise database is not refreshed
 	if request.method == 'GET':
 		# get organizer
 		cur.execute("SELECT * FROM organizers WHERE id=%d" % id)
 		org = cur.fetchone()
-		keys = [
-			'id',
-			'name',
-			'owner_id',
-			'entry_fee',
-			'description'
-			]
 		resp = {}
 		if (org is None):
 			resp = Response(status=404)
 			return resp
 		else:
-			money = str(org[3])[:-2] + "." + str(org[3])[-2:] #change entry fee from cent int to string decimal (used to display in json)
-			show_results(keys, resp, org)
+			show_results(league_keys, resp, org)
+			money = str(resp['entry_fee'])[:-2] + "." + str(resp['entry_fee'])[-2:] #change entry fee from cent int to string decimal (used to display in json)
 			resp['entry_fee'] = money
 			return json.dumps(resp)
 	elif request.method == 'PUT':
@@ -92,7 +225,7 @@ def showLeague(id):
 		body['id'] = id
 		try:
 			body['entry_fee'] = int(body['entry_fee'])
-			cur.execute('UPDATE organizers SET name = %(name)s, entry_fee = %(entry_fee)s, owner_id = 1, description = %(description)s WHERE id=%(id)s', body)
+			cur.execute('UPDATE organizers SET ' + put_post(league_keys, ['id'], body, 'PUT') + ' WHERE id=' + str(body['id']))
 			conn.commit()
 			return Response(status=200)
 		except (mysql.connector.Error, KeyError) as err:
@@ -109,7 +242,7 @@ def showLeague(id):
 			return Response(status=200)	
 
 @app.route("/leagues/<int:id>/teams", methods=['GET', 'POST'])
-def showLeagueTeams(id):
+def LeagueTeams(id):
 	conn.commit() # allows reload for testing otherwise database is not refreshed
 	if request.method == 'GET':
 		# get organizer
@@ -117,11 +250,6 @@ def showLeagueTeams(id):
 		team = cur.fetchall()
 		cur.execute("SELECT * FROM organizers WHERE id=%d" % id)
 		league = cur.fetchall()
-		keys = [
-			'id',
-			'name',
-			'description'
-			]
 		resp = []
 		if (league == []):
 			resp = Response(status=404)
@@ -129,21 +257,21 @@ def showLeagueTeams(id):
 		else:
 			for a in range(len(team)):
 				obj = {}
-				show_results(keys, obj, team, a)
+				show_results(team_keys, obj, team, a)
 				resp.append(obj)
 			return json.dumps(resp)	
 	elif request.method == 'POST':
 		body = json.dumps(request.form)
 		body = json.loads(body)
 		try: 
-			cur.execute('INSERT INTO organizers_teams (organizer_id, team_id) VALUES('+str(id)+', '+body['team_id'])
+			cur.execute('INSERT INTO organizers_teams ' + put_post(organizer_team_keys, ['id','request'], body, 'POST'))
 			conn.commit()
 			return Response(status=200)
 		except (mysql.connector.Error, KeyError) as err:
 			return Response(status=404)
 
 @app.route("/leagues/<int:id>/teams/requests", methods=['GET', 'POST'])
-def showLeagueTeamsRequests(id):
+def LeagueTeamsRequests(id):
 	conn.commit() # allows reload for testing otherwise database is not refreshed
 	if request.method == 'GET':
 		# get organizer
@@ -151,12 +279,6 @@ def showLeagueTeamsRequests(id):
 		team = cur.fetchall()
 		cur.execute("SELECT * FROM organizers WHERE id=%d" % id)
 		league = cur.fetchall()
-		keys = [
-			'id',
-			'name',
-			'owner_id',
-			'description'
-			]
 		resp = []
 		if (league == []):
 			resp = Response(status=404)
@@ -164,46 +286,40 @@ def showLeagueTeamsRequests(id):
 		else:
 			for a in range(len(team)):
 				obj = {}
-				show_results(keys, obj, team, a)
+				show_results(team_keys, obj, team, a)
 				resp.append(obj)
 			return json.dumps(resp)	
 	elif request.method == 'POST':
 		body = json.dumps(request.form)
 		body = json.loads(body)
 		try: 
-			cur.execute('INSERT INTO organizers_teams (organizer_id, team_id) VALUES('+str(id)+', '+body['team_id'])
+			cur.execute('INSERT INTO organizers_teams ' + put_post(organizer_team_keys, ['id','request'], body, 'POST'))
 			conn.commit()
 			return Response(status=200)
 		except (mysql.connector.Error, KeyError) as err:
 			return Response(status=404)
 
 @app.route("/leagues/<int:org_id>/teams/<int:t_id>", methods=['GET', 'PUT', 'DELETE'])
-def LeagueTeams(org_id, t_id):
+def LeagueTeam(org_id, t_id):
 	conn.commit() # allows reload for testing otherwise database is not refreshed
 	if request.method == 'GET':
 		cur.execute("SELECT * FROM organizers_teams WHERE organizer_id="+str(org_id)+" AND team_id="+str(t_id))
 		team = cur.fetchone()
-		keys = [
-			'id',
-			'organizer_id',
-			'team_id'
-			]
 		resp = {}
 		if (team is None):
 			resp = Response(status=404)
 			return resp
 		else:
-			show_results(keys, resp, team)
+			show_results(organizer_team_keys, resp, team)
 			return json.dumps(resp)
 	elif request.method == 'PUT':
 		body = json.dumps(request.form)
 		body = json.loads(body)
 		cur.execute("SELECT * FROM organizers_teams WHERE organizer_id="+str(org_id)+" AND team_id="+str(t_id))
 		team = cur.fetchone()
-		print(team)
 		body['id'] = team[0]
 		try:
-			cur.execute('UPDATE organizers_teams SET request = %(request)s WHERE id=%(id)s', body)
+			cur.execute('UPDATE organizers_teams SET ' + put_post(organizer_team_keys, ['id','organizer_id','team_id'], body, 'PUT') + ' WHERE id=' + str(body['id']))
 			conn.commit()
 			return Response(status=200)
 		except (mysql.connector.Error, KeyError) as err:
@@ -219,7 +335,7 @@ def LeagueTeams(org_id, t_id):
 			return Response(status=200)
 
 @app.route("/leagues/<int:id>/tournaments", methods=['GET'])
-def showLeagueTournaments(id):
+def LeagueTournaments(id):
 	conn.commit() # allows reload for testing otherwise database is not refreshed
 	if request.method == 'GET':
 		# get organizer
@@ -227,84 +343,63 @@ def showLeagueTournaments(id):
 		trn = cur.fetchall()
 		cur.execute("SELECT * FROM organizers WHERE id=%d" % id)
 		league = cur.fetchall()
-		keys = [
-			'id',
-			'organizer_id',
-			'name',
-			'type',
-			'size',
-			'start_date',
-			'end_date',
-			'entry_fee',
-			'description'
-			]
 		resp = []
 		if (league == []):
 			resp = Response(status=404)
 			return resp
 		else:
 			for a in range(len(trn)):
-				money = str(trn[a][7])[:-2] + "." + str(trn[a][7])[-2:] #change entry fee from cent int to string decimal (used to display in json)
 				obj = {}
-				show_results(keys, obj, trn, a)
+				show_results(tournament_keys, obj, trn, a)
+				money = str(obj['entry_fee'])[:-2] + "." + str(obj['entry_fee'])[-2:] #change entry fee from cent int to string decimal (used to display in json)
 				obj['entry_fee'] = money
 				resp.append(obj)
 			return json.dumps(resp, default=str)
 
 #team routes
 @app.route("/teams", methods=['GET', 'POST'])
-def teams():
+def Teams():
 	conn.commit() # allows reload for testing otherwise database is not refreshed
 	if request.method == 'GET':
 		# get all teams
 		resp = []
 		cur.execute("SELECT * FROM teams")
 		team = cur.fetchall()
-		keys = [
-			'id',
-			'name',
-			'description'
-			]
 		for a in range(len(team)):
 			obj = {}
-			show_results(keys, obj, team, a)
+			show_results(team_keys, obj, team, a)
 			resp.append(obj)		
 		return json.dumps(resp)
 	elif request.method == 'POST':
 		body = json.dumps(request.form)
 		body = json.loads(body)
 		try: 
-			cur.execute('INSERT INTO teams (name, description) VALUES(%(name)s, %(description)s)', body)
+			cur.execute('INSERT INTO teams ' + put_post(team_keys, ['id'], body, 'POST'))
 			conn.commit()
 			return Response(status=200)
 		except (mysql.connector.Error, KeyError) as err:
 			return Response(status=404)
 
 @app.route("/teams/<int:id>", methods=['GET', 'PUT', 'DELETE'])
-def showTeam(id):
+def Team(id):
 	conn.commit() # allows reload for testing otherwise database is not refreshed
 	if request.method == 'GET':
 		# get team
 		cur.execute("SELECT * FROM teams WHERE id=%d" % id)
 		team = cur.fetchone()
-		keys = [
-			'id',
-			'name',
-			'description'
-			]
 		resp = {}
 		if (team is None):
 			resp = Response(status=404)
 			return resp
 		else:
-			show_results(keys, resp, team)
+			show_results(team_keys, resp, team)
 			return json.dumps(resp)
 	elif request.method == 'PUT':
 		body = json.dumps(request.form)
 		body = json.loads(body)
 		body['id'] = id
 		try:
-			cur.execute('UPDATE teams SET name = %(name)s, description = %(description)s WHERE id=%(id)s', body)
+			cur.execute('UPDATE teams SET ' + put_post(team_keys, ['id'], body, 'PUT') + ' WHERE id=' + str(body['id']))
 			conn.commit()
 			return Response(status=200)
 		except (mysql.connector.Error, KeyError) as err:
@@ -315,12 +410,13 @@ def showTeam(id):
 			return Response(status=404)
 		else:
 			cur.execute('DELETE FROM organizers_teams WHERE team_id=%d' % id)
+			cur.execute('UPDATE users SET team_id=Null WHERE team_id=%d' % id )
 			cur.execute('DELETE FROM teams WHERE id=%d' % id )
 			conn.commit()
 			return Response(status=200)	
 
 @app.route("/teams/<int:id>/leagues", methods=['GET', 'PUT', 'DELETE'])
-def showTeamLeagues(id):
+def TeamLeagues(id):
 	conn.commit() # allows reload for testing otherwise database is not refreshed
 	if request.method == 'GET':
 		# get organizer
@@ -328,13 +424,6 @@ def showTeamLeagues(id):
 		team = cur.fetchall()
 		cur.execute("SELECT * FROM organizers WHERE id=%d" % id)
 		league = cur.fetchall()
-		keys = [
-			'id',
-			'name',
-			'owner_id',
-			'entry_fee',
-			'description'
-			]
 		resp = []
 		if (league == []):
 			resp = Response(status=404)
@@ -342,34 +431,23 @@ def showTeamLeagues(id):
 		else:
 			for a in range(len(team)):
 				obj = {}
-				show_results(keys, obj, team, a)
+				show_results(league_keys, obj, team, a)
 				resp.append(obj)
 			return json.dumps(resp)		
 
 # tournament routes
 @app.route("/tournaments", methods=['GET', 'POST'])
-def tournaments():
+def Tournaments():
 	conn.commit() # allows reload for testing otherwise database is not refreshed
 	if request.method == 'GET':
 		# get all organizers
 		resp = []
 		cur.execute("SELECT * FROM tournaments")
 		trn = cur.fetchall()
-		keys = [
-			'id',
-			'organizer_id',
-			'name',
-			'type',
-			'size',
-			'start_date',
-			'end_date',
-			'entry_fee',
-			'description'
-			]
 		for a in range(len(trn)):
 			money = str(trn[a][7])[:-2] + "." + str(trn[a][7])[-2:] #change entry fee from cent int to string decimal (used to display in json)
 			obj = {}
-			show_results(keys, obj, trn, a)
+			show_results(tournament_keys, obj, trn, a)
 			obj['entry_fee'] = money
 			resp.append(obj)
 		return json.dumps(resp, default=str)
@@ -378,37 +456,26 @@ def tournaments():
 		body = json.loads(body)
 		try: 
 			body['entry_fee'] = int(body['entry_fee'])
-			cur.execute('INSERT INTO tournaments (organizer_id, name, type, size, start_date, entry_fee, description) VALUES(1, %(name)s, %(type)s, %(size)s, %(start_date)s, %(entry_fee)s, %(description)s)', body)
+			cur.execute('INSERT INTO tournaments ' + put_post(tournament_keys, ['id', 'end_date'], body, 'POST'))
 			conn.commit()
 			return Response(status=200)
 		except (mysql.connector.Error, KeyError) as err:
 			return Response(status=404)
 
 @app.route("/tournaments/<int:id>", methods=['GET', 'PUT', 'DELETE'])
-def showTournament(id):
+def Tournament(id):
 	conn.commit() # allows reload for testing otherwise database is not refreshed
 	if request.method == 'GET':
 		# get organizer
 		cur.execute("SELECT * FROM tournaments WHERE id=%d" % id)
 		trn = cur.fetchone()
-		keys = [
-			'id',
-			'organizer_id',
-			'name',
-			'type',
-			'size',
-			'start_date',
-			'end_date',
-			'entry_fee',
-			'description'
-			]
 		resp = {}
 		if (trn is None):
 			resp = Response(status=404)
 			return resp
 		else:
-			money = str(trn[7])[:-2] + "." + str(trn[7])[-2:] #change entry fee from cent int to string decimal (used to display in json)
-			show_results(keys, resp, trn)
+			show_results(tournament_keys, resp, trn)
+			money = str(resp['entry_fee'])[:-2] + "." + str(resp['entry_fee'])[-2:] #change entry fee from cent int to string decimal (used to display in json)
 			resp['entry_fee'] = money
 			return json.dumps(resp, default=str)
 	elif request.method == 'PUT':
@@ -417,7 +484,7 @@ def showTournament(id):
 		body['id'] = id
 		try:
 			body['entry_fee'] = int(body['entry_fee'])
-			cur.execute('UPDATE tournaments SET name = %(name)s, type = %(type)s, size = %(size)s, start_date = %(start_date)s, end_date = %(end_date)s, entry_fee = %(entry_fee)s, description = %(description)s WHERE id=%(id)s', body)
+			cur.execute("UPDATE tournaments SET " + put_post(tournament_keys, ['id'], body, 'PUT') + " WHERE id=" + str(body['id']))
 			conn.commit()
 			return Response(status=200)
 		except (mysql.connector.Error, KeyError) as err:
