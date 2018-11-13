@@ -24,12 +24,12 @@ class Requests(unittest.TestCase):
         conn.commit()
 
     def test_get_teams(self):
-        result = [{"id": 1, "name": "FuRy", "owner_id": 1, "description": "Andrew is a god"}, {"id": 2, "name": "Artemis", "owner_id": 2, "description": "Not your average expieriance"}, {"id": 3, "name": "Faze", "owner_id": 2, "description": "Olof is a criminal"}, {"id": 4, "name": "Outer Heavan", "owner_id": 1, "description": "... wtf"}]
+        result = [{"id": 1, "name": "FuRy", "description": "Andrew is a god"}, {"id": 2, "name": "Artemis", "description": "Not your average expieriance"}, {"id": 3, "name": "Faze", "description": "Olof is a criminal"}, {"id": 4, "name": "Outer Heavan", "description": "... wtf"}]
         r = requests.get(url + 'teams')
         self.assertEqual(result, r.json())
 
     def test_get_team(self):
-        result = {"id": 1, "name": "FuRy", "owner_id": 1, "description": "Andrew is a god"}
+        result = {"id": 1, "name": "FuRy", "description": "Andrew is a god"}
         r = requests.get(url + 'teams/1')
         self.assertEqual(result, r.json())
 
@@ -39,12 +39,12 @@ class Requests(unittest.TestCase):
         self.assertEqual(result, r.json())
 
     def test_post_team(self):
-        r = requests.post(url + 'teams', data={"name": "Test", "owner_id": 1, "description": "Test"})
+        r = requests.post(url + 'teams', data={"name": "Test", "description": "Test"})
         self.assertEqual(200, r.status_code)
 
     def test_edit_team(self):
-        result = {"id": 1, "name": "Test", "owner_id": 1, "description": "Test"}
-        r = requests.put(url + 'teams/1', data={"name": "Test", "owner_id": 1, "description": "Test"})
+        result = {"id": 1, "name": "Test", "description": "Test"}
+        r = requests.put(url + 'teams/1', data={"name": "Test", "description": "Test"})
         r2 = requests.get(url + 'teams/1')
         self.assertEqual(200, r.status_code)
         self.assertEqual(result, r2.json())
