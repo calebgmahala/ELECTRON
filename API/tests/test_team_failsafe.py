@@ -40,7 +40,7 @@ class FailRequests(unittest.TestCase):
         self.assertEqual(404, r.status_code)
 
     def test_fail_post_team(self):
-        r = requests.post(url + 'teams', data={"owner_id": 1, "description": "Test"})
+        r = requests.post(url + 'teams', data={"description": "Test"})
         self.assertEqual(404, r.status_code)
 
     def test_fail_edit_team(self):
@@ -50,7 +50,7 @@ class FailRequests(unittest.TestCase):
         cur.execute('DELETE FROM `users` WHERE 1=1;')
         cur.execute('DELETE FROM `teams` WHERE 1=1;')
         conn.commit()
-        r = requests.put(url + 'teams/1', data={"owner_id": 1, "description": "Test"})
+        r = requests.put(url + 'teams/1', data={"description": "Test"})
         self.assertEqual(404, r.status_code)
 
     def test_fail_delete_team(self):

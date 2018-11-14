@@ -1,5 +1,8 @@
 node_modules/
 API/venv/
+API/__pycache__/
+API/api/__pycache__/
+API/tests/__pycache__/
 *.xlsx
 .sass-cache/
 APP/public/colors.html
