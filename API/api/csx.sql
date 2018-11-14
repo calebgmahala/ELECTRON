@@ -11,6 +11,7 @@ DROP TABLE IF EXISTS `teams`;
 CREATE TABLE `teams` (
 	`id` int(11) NOT NULL AUTO_INCREMENT,
     `name` varchar(45) NOT NULL,
+    `team_key` varchar(64) NOT NULL,
     `description` text,
     PRIMARY KEY (`id`)
 );
@@ -19,11 +20,13 @@ CREATE TABLE `users` (
     `username` varchar(45) NOT NULL,
     `password` varchar(64) NOT NULL,
     `request_key` varchar(64),
+    `permission` int(1) NOT NULL DEFAULT 0,
     `team_id` int(11),
     `is_owner_team` int(1) NOT NULL DEFAULT 0,
     `description` text,
     `role` int(2),
     UNIQUE (`username`),
+    UNIQUE (`request_key`),
     PRIMARY KEY (`id`),
     FOREIGN KEY (`team_id`) REFERENCES `teams`(`id`)
 );
@@ -67,6 +70,7 @@ DROP TABLE IF EXISTS `teams`;
 CREATE TABLE `teams` (
 	`id` int(11) NOT NULL AUTO_INCREMENT,
     `name` varchar(45) NOT NULL,
+    `team_key` varchar(64) NOT NULL,
     `description` text,
     PRIMARY KEY (`id`)
 );
@@ -75,11 +79,13 @@ CREATE TABLE `users` (
     `username` varchar(45) NOT NULL,
     `password` varchar(64) NOT NULL,
     `request_key` varchar(64),
+    `permission` int(1) NOT NULL DEFAULT 0,
     `team_id` int(11),
     `is_owner_team` int(1) NOT NULL DEFAULT 0,
     `description` text,
     `role` int(11),
     UNIQUE (`username`),
+    UNIQUE (`request_key`),
     PRIMARY KEY (`id`),
     FOREIGN KEY (`team_id`) REFERENCES `teams`(`id`)
 );

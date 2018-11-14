@@ -45,10 +45,23 @@ def put_post(var, notkeys, inserts, putpost):
 	elif putpost == 'PUT':
 		value = ''
 		for i in range(len(var)):
-			if var[i] not in notkeys:
+			if var[i] not in notkeys and var[i] in inserts:
 				value = value + str(var[i]) + " = '" + str(inserts[var[i]]) + "', "
 		resp = value[:-2]
 		return(resp)
+
+# check auth function
+def check_auth(table, key, field, perms):
+	authpass = False
+	if perms is not None:
+		cur.execute('SELECT ' + str(key) + ' FROM ' + str(table) + ' WHERE ' + str(field) + '=' + str(perms))
+		values = cur.fetchall()
+		for i in values:
+			if i[0] is not None:
+				if bcrypt.checkpw(request.headers.get(key).encode("utf-8"), i[0].encode("utf-8")):
+					authpass = True
+					break
+	return authpass
 
 # gen key function
 # credits to https://stackoverflow.com/questions/2257441/random-string-generation-with-upper-case-letters-and-digits-in-python
@@ -69,6 +82,7 @@ league_keys = [
 team_keys = [
 	'id',
 	'name',
+	'team_key',
 	'description']
 organizer_team_keys = [
 	'id',
@@ -90,6 +104,7 @@ user_keys = [
 	'username',
 	'password',
 	'request_key',
+	'permission',
 	'team_id',
 	'is_owner_team',
 	'description',
@@ -114,7 +129,7 @@ def Users():
 		body = json.loads(body)
 		try: 
 			body['password'] = bcrypt.hashpw( body['password'].encode("utf-8"), bcrypt.gensalt()).decode('utf-8')
-			cur.execute('INSERT INTO users ' + put_post(user_keys, ['id', 'request_key', 'team_id', 'is_owner_team', 'description', 'role'], body, 'POST'))
+			cur.execute('INSERT INTO users ' + put_post(user_keys, ['id', 'request_key', 'permission', 'team_id', 'is_owner_team', 'description', 'role'], body, 'POST'))
 			conn.commit()
 			return Response(status=200)
 		except (mysql.connector.Error, KeyError) as err:
@@ -134,21 +149,35 @@ def User(id):
 		else:
 			show_results(user_keys, resp, usr, notkeys=['password', 'request_key'])
 			return json.dumps(resp)
-	# elif request.method == 'PUT':
-	# 	body = json.dumps(request.form)
-	# 	body = json.loads(body)
-	# 	body['id'] = id
-	# 	try:
-	# 		body['entry_fee'] = int(body['entry_fee'])
-	# 		cur.execute('UPDATE organizers SET ' + put_post(league_keys, ['id'], body, 'PUT') + ' WHERE id=' + str(body['id']))
-	# 		conn.commit()
-	# 		return Response(status=200)
-	# 	except (mysql.connector.Error, KeyError) as err:
-	# 		return Response(status=404)
+	elif request.method == 'PUT':
+		cur.execute('SELECT * FROM users WHERE id='+str(id))
+		body = json.dumps(request.form)
+		body = json.loads(body)
+		body['id'] = id
+		if cur.fetchone() is None:
+			return Response(status=404)
+		elif check_auth('users', 'request_key', 'id', id) and check_auth('teams', 'team_key', 'id', request.headers.get('team_id')):
+			cur.execute('UPDATE users SET team_id=' + request.headers.get('team_id') + ' WHERE id=' + str(body['id']))
+			conn.commit()
+			return Response(status=200)
+		elif len(request.form) is 0:
+			return Response(status=409)
+		elif check_auth('users', 'request_key', 'permission', 2):
+			cur.execute('UPDATE users SET ' + put_post(user_keys, ['id'], body, 'PUT') + ' WHERE id=' + str(body['id']))
+			conn.commit()
+			return Response(status=200)
+		elif check_auth('users', 'request_key', 'id', id):
+			cur.execute('UPDATE users SET ' + put_post(user_keys, ['id', 'request_key', 'permission', 'team_id', 'is_owner_team'], body, 'PUT') + ' WHERE id=' + str(body['id']))
+			conn.commit()
+			return Response(status=200)
+		else:
+			return Response(status=409)
 	elif request.method == 'DELETE':
 		cur.execute('SELECT * FROM users WHERE id=%d' % id)
 		if (cur.fetchone() is None):
 			return Response(status=404)
+		elif not check_auth('users', 'request_key', 'id', id) and not check_auth('users', 'request_key', 'id', 'team_id'):
+			return Response(status=409)
 		else:
 			cur.execute('DELETE FROM organizers_teams WHERE organizer_id=%d' % id)
 			cur.execute('DELETE FROM tournaments WHERE organizer_id=%d' % id )			
@@ -220,16 +249,17 @@ def League(id):
 			resp['entry_fee'] = money
 			return json.dumps(resp)
 	elif request.method == 'PUT':
+		cur.execute('SELECT * FROM organizers WHERE id='+str(id))
 		body = json.dumps(request.form)
 		body = json.loads(body)
 		body['id'] = id
-		try:
+		if cur.fetchone() is None:
+			return Response(status=404)
+		else:
 			body['entry_fee'] = int(body['entry_fee'])
 			cur.execute('UPDATE organizers SET ' + put_post(league_keys, ['id'], body, 'PUT') + ' WHERE id=' + str(body['id']))
 			conn.commit()
 			return Response(status=200)
-		except (mysql.connector.Error, KeyError) as err:
-			return Response(status=404)
 	elif request.method == 'DELETE':
 		cur.execute('SELECT * FROM organizers WHERE id=%d' % id)
 		if (cur.fetchone() is None):
@@ -257,7 +287,7 @@ def LeagueTeams(id):
 		else:
 			for a in range(len(team)):
 				obj = {}
-				show_results(team_keys, obj, team, a)
+				show_results(team_keys, obj, team, a, ['team_key'])
 				resp.append(obj)
 			return json.dumps(resp)	
 	elif request.method == 'POST':
@@ -286,7 +316,7 @@ def LeagueTeamsRequests(id):
 		else:
 			for a in range(len(team)):
 				obj = {}
-				show_results(team_keys, obj, team, a)
+				show_results(team_keys, obj, team, a, ['team_key'])
 				resp.append(obj)
 			return json.dumps(resp)	
 	elif request.method == 'POST':
@@ -367,12 +397,13 @@ def Teams():
 		team = cur.fetchall()
 		for a in range(len(team)):
 			obj = {}
-			show_results(team_keys, obj, team, a)
+			show_results(team_keys, obj, team, a, ['team_key'])
 			resp.append(obj)		
 		return json.dumps(resp)
 	elif request.method == 'POST':
 		body = json.dumps(request.form)
 		body = json.loads(body)
+		body['team_key'] = bcrypt.hashpw( key_gen().encode("utf-8"), bcrypt.gensalt()).decode('utf-8')
 		try: 
 			cur.execute('INSERT INTO teams ' + put_post(team_keys, ['id'], body, 'POST'))
 			conn.commit()
@@ -392,18 +423,19 @@ def Team(id):
 			resp = Response(status=404)
 			return resp
 		else:
-			show_results(team_keys, resp, team)
+			show_results(team_keys, resp, team, notkeys=['team_key'])
 			return json.dumps(resp)
 	elif request.method == 'PUT':
+		cur.execute('SELECT * FROM teams WHERE id='+str(id))
 		body = json.dumps(request.form)
 		body = json.loads(body)
 		body['id'] = id
-		try:
+		if cur.fetchone() is None:
+			return Response(status=404)
+		else:
 			cur.execute('UPDATE teams SET ' + put_post(team_keys, ['id'], body, 'PUT') + ' WHERE id=' + str(body['id']))
 			conn.commit()
 			return Response(status=200)
-		except (mysql.connector.Error, KeyError) as err:
-			return Response(status=404)
 	elif request.method == 'DELETE':
 		cur.execute('SELECT * FROM teams WHERE id=%d' % id)
 		if (cur.fetchone() is None):
