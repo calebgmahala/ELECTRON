@@ -39,7 +39,7 @@ class Requests(unittest.TestCase):
         self.assertEqual(result, r.json())
 
     def test_post_team(self):
-        r = requests.post(url + 'teams', data={"name": "Test", "description": "Test"})
+        r = requests.post(url + 'teams', data={"name": "Test", "description": "Test", "team_key": 'root'})
         self.assertEqual(200, r.status_code)
 
     def test_edit_team(self):

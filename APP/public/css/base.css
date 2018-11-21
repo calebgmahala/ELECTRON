@@ -65,6 +65,11 @@ header {
       margin-bottom: 30px;
       width: 50% height; }
     .header .headerBox .user {
+      display: inline-block;
+      padding-top: 10px;
+      float: right; }
+    .header .headerBox #logout {
+      display: inline-block;
       padding-top: 10px;
       float: right; }
   .header ul {

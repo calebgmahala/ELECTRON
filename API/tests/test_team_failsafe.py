@@ -40,7 +40,7 @@ class FailRequests(unittest.TestCase):
         self.assertEqual(404, r.status_code)
 
     def test_fail_post_team(self):
-        r = requests.post(url + 'teams', data={"description": "Test"})
+        r = requests.post(url + 'teams', data={"description": "Test", 'team_key':'test'})
         self.assertEqual(404, r.status_code)
 
     def test_fail_edit_team(self):
