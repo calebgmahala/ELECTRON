@@ -49,34 +49,34 @@ class Requests(unittest.TestCase):
         self.assertEqual(result, r.json())
 
     def test_post_team_leagues(self):
-        r = requests.get(url + 'leagues/1/teams', data={"organizer_id":2, "team_id":3})
+        r = requests.get(url + 'leagues/1/teams', data={"organizer_id":2, "team_id":3}, headers={'request_key':'root'})
         self.assertEqual(200, r.status_code)
 
     def test_post_league(self):
-        r = requests.post(url + 'leagues', data={"name": "Test", "owner_id": 1, "entry_fee": 1000, "description": "Test"})
+        r = requests.post(url + 'leagues', data={"name": "Test", "owner_id": 1, "organizer_key": "test", "entry_fee": 1000, "description": "Test"}, headers={'request_key': 'root'})
         self.assertEqual(200, r.status_code)
 
     def test_edit_league(self):
         result = {"id": 1, "name": "Test", "owner_id": 1, "entry_fee": "10.00", "description": "Test"}
-        r = requests.put(url + 'leagues/1', data={"name": "Test", "owner_id": 1, "entry_fee": 1000, "description": "Test"})
+        r = requests.put(url + 'leagues/1', data={"name": "Test", "owner_id": 1, "entry_fee": 1000, "description": "Test"}, headers={'request_key':'root'})
         r2 = requests.get(url + 'leagues/1')
         self.assertEqual(200, r.status_code)
         self.assertEqual(result, r2.json())
 
     def test_edit_league_teams(self):
-        r = requests.put(url + 'leagues/2/teams/2', data={"request": 0})
+        r = requests.put(url + 'leagues/2/teams/2', data={"request": 0}, headers={'request_key':'root2'})
         r2 = requests.get(url + 'leagues/2/teams/requests')
         self.assertEqual(200, r.status_code)
         self.assertEqual([], r2.json())
 
     def test_delete_league(self):
-        r = requests.delete(url + 'leagues/1')
+        r = requests.delete(url + 'leagues/1', headers={'request_key':'root'})
         r2 = requests.get(url + 'leagues/1')
         self.assertEqual(200, r.status_code)
         self.assertEqual(404, r2.status_code)
 
     def test_delete_team_leagues(self):
-        r = requests.delete(url + 'leagues/1/teams/1')
+        r = requests.delete(url + 'leagues/1/teams/1', headers={'request_key': 'root'})
         r2 = requests.get(url + 'leagues/1/teams/1')
         self.assertEqual(200, r.status_code)
         self.assertEqual(404, r2.status_code)

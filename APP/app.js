@@ -21,10 +21,10 @@ app.use(bodyParser.json());
 app.use(session({secret: "I play pokemon go everyday", resave: false, saveUninitialized: true}));
 
 //  api request function
-function CallApi(a) {
+function CallApi(a, b='GET') {
 	var resp = ''
 	return new Promise(function(resolve, reject){
-	    request('http://localhost:5000/'+a, function (error, response, body) {
+	    request({url: 'http://localhost:5000/'+a, method: b}, function (error, response, body) {
 	    	if (!error && response.statusCode == 200) {	
 	    		resolve(body)
 	  		} else {
@@ -48,7 +48,25 @@ app.post('/login', function(req, res) {
     	json: true}, function(error, response, body){
 		if (!error && response.statusCode == 200) {
     		req.session.user = body['username']
+    		req.session.user_id = body['id']
     		req.session.key = body['request_key']
+			res.sendStatus(200) 
+  		} else {
+  			res.sendStatus(404)
+  		}
+	});
+})
+
+app.get('/logout', function(req, res) {
+	var body = req.body
+	var key = req.headers
+    request({
+    	method: 'DELETE',
+    	url: 'http://localhost:5000/login',
+    	form: {'id': req.session.user_id},
+    	headers: {'request_key': req.session.key}}, function(error, response, body){
+		if (!error && response.statusCode == 200) {
+    		req.session.destroy()
 			res.sendStatus(200) 
   		} else {
   			res.sendStatus(404)
@@ -99,7 +117,7 @@ app.get('/leagues', function(req, res) {
 	}
 	// make an api call and on response render the html page.
 	CallApi('leagues').then(function(value) {
-		res.render('leagues.html', {"table": Table(value), "title": "Leagues", "user": req.session.user, "body": value})
+		res.render('leagues.html', {"table": Table(value), "title": "Leagues", "user": req.session.user, "id": req.session.user_id, "key": req.session.key})
 	})
 })
 
@@ -160,7 +178,9 @@ app.get('/league/:id', function(req, res) {
 						"tournaments": Card(tournaments),
 						"teams": TeamsTable(teams),
 						"teams_request": RequestsTable(requests),
-						"user": req.session.user,
+						"user": req.session.user, 
+						"id": req.session.user_id, 
+						"key": req.session.key
 					})
 				})
 			})

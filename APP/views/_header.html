@@ -2,7 +2,10 @@
 	<div class="header">
 		<div class="headerBox">
 			<img src="/images/profile_pic.png">
+			{{#user}}
 			<h2 class="user">{{user}}</h2>
+			<button id="logout">logout</button>
+			{{/user}}
 		</div>
 		<ul>
 			<li><a href="http://localhost:3000/leagues">Leagues</a></li>

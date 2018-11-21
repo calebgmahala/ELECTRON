@@ -19,9 +19,15 @@ header {
 			width: 50% height;
 		}
 		.user {
+			display: inline-block;
 			padding-top: 10px;
 			float: right;
 
+		}
+		#logout {
+			display: inline-block;
+			padding-top: 10px;
+			float: right;
 		}
 	}
 	ul {

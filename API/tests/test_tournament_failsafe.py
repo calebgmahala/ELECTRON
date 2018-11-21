@@ -30,20 +30,32 @@ class FailRequests(unittest.TestCase):
         self.assertEqual(404, r.status_code)
 
     def test_fail_post_tournament(self):
-        r = requests.post(url + 'tournaments', data={"name": 1, "description": "Test"})
+        r = requests.post(url + 'tournaments', data={"name": 1, "description": "Test"}, headers={'request_key':'root'})
         self.assertEqual(404, r.status_code)
+
+    def test_fail_auth_post_tournament(self):
+        r = requests.post(url + 'tournaments', data={"name": 1, "description": "Test"})
+        self.assertEqual(409, r.status_code)
 
     def test_fail_edit_tournament(self):
         cur.execute('DELETE FROM `tournaments` WHERE 1=1;')
         conn.commit()
-        r = requests.put(url + 'tournaments/1', data={"name": 1, "description": "Test"})
+        r = requests.put(url + 'tournaments/1', data={"name": 1, "description": "Test"}, headers={'request_key':'root'})
         self.assertEqual(404, r.status_code)
+
+    def test_fail_auth_edit_tournament(self):
+        r = requests.put(url + 'tournaments/1', data={"name": 1, "description": "Test"})
+        self.assertEqual(409, r.status_code)
 
     def test_fail_delete_tournament(self):
         cur.execute('DELETE FROM `tournaments` WHERE 1=1;')
         conn.commit()
-        r = requests.delete(url + 'tournaments/1')
+        r = requests.delete(url + 'tournaments/1', headers={'request_key':'root'})
         self.assertEqual(404, r.status_code)
+
+    def test_fail_auth_delete_tournament(self):
+        r = requests.delete(url + 'tournaments/1')
+        self.assertEqual(409, r.status_code)
 
 if __name__ == '__main__':
     unittest.main()
