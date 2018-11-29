@@ -15,11 +15,11 @@ import random
 app = Flask(__name__)
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 cors = CORS(app)
-env = 'test'
+env = 'csx'
 
 #connect to mysql database
 def connect_db():
-	return mysql.connector.connect(user='root', database=env, host='localhost')
+	return mysql.connector.connect(user='root', database=env, host='35.237.92.34', password='63099grant')
 
 #show results function
 def show_results(keys, obj, resp, respit=None, notkeys=[]):
@@ -121,6 +121,10 @@ bracket_keys = [
 	'games_lost',
 	'score'
 ]
+
+@app.route("/", methods=['GET'])
+def home():
+	return 'hello world'
 
 #users routes
 @app.route("/users", methods=['GET', 'POST'])

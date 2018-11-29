@@ -2,7 +2,7 @@
 const express = require('express')
 const app = express()
 app.use(express.static('public'))
-const port = 3000
+const port = process.env.PORT
 
 // require is used to send out api requests
 const request = require('request')
@@ -26,7 +26,7 @@ templateVar = {}
 function CallApi(a, b='GET') {
 	var resp = ''
 	return new Promise(function(resolve, reject){
-	    request({url: 'http://localhost:5000/'+a, method: b}, function (error, response, body) {
+	    request({url: 'https://electron-schedule.herokuapp.com/'+a, method: b}, function (error, response, body) {
 	    	if (!error && response.statusCode == 200) {	
 	    		resolve(body)
 	  		} else {
