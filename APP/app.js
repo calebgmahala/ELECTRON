@@ -20,6 +20,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(session({secret: "I play pokemon go everyday", resave: false, saveUninitialized: true}));
 
+templateVar = {}
+
 //  api request function
 function CallApi(a, b='GET') {
 	var resp = ''
@@ -34,9 +36,43 @@ function CallApi(a, b='GET') {
 	})
 }
 
+function resetTempVar() {
+	var resp = {}
+	resp['user'] = templateVar["user"]
+	resp['id'] = templateVar["id"]
+	resp['key'] = templateVar["key"]
+
+	return resp
+}
+
+function roles(user) {
+	if (user['role'] == 1) {
+		return 'rifler'
+	} else if (user['role'] == 2) {
+		return 'awper'
+	} else{
+		return 'undefined'
+	}
+}
+
+function types(tourn) {
+	if (tourn['type'] == 1) {
+		return 'league'
+	} else if (tourn['type'] == 2) {
+		return 'tournament'
+	} else{
+		return 'undefined'
+	}
+}
+
 // login and users
 app.get('/login', function(req, res) {
-	res.render('login.html', {'file': 'login.js'})
+	templateVar = resetTempVar()
+	templateVar["user"] = req.session.user 
+	templateVar["id"] = req.session.user_id
+	templateVar["key"] = req.session.key
+	templateVar['file'] = 'login.js'
+	res.render('login.html', templateVar)
 })
 
 app.post('/login', function(req, res) {
@@ -75,50 +111,54 @@ app.get('/logout', function(req, res) {
 })
 
 app.get('/signup', function(req, res) {
-	res.render('login.html', {"user": req.session.user, "file": "signup.js"})
+	templateVar['file'] = 'signup.js'
+	res.render('login.html', templateVar)
 })
 
 app.get('/users', function(req, res) {
-	// function to put together table for html page
-	function Table(a) {
-		a = JSON.parse(a)// turn a into object otherwise it is a string
-		string = "<tr><th>Id</th><th>Username</th><th>Team Id</th><th>Is Owner of Team?</th><th>Description</th><th>role</th></tr>";
-		for (var b in a) {
-			string = string + "<tr><td>"
-			string = string + a[b]['id'] + "</td><td>"
-			string = string + "<a href='/user/" + a[b]['id'] + "'>" + a[b]['username'] + "</td><td>"
-			string = string + "<a href='/team/" + a[b]['team_id'] + "'>" + a[b]['team_id'] + "</a></td><td>"
-			string = string + a[b]['is_owner_team'] + "</td><td>"
-			string = string + a[b]['description'] + "</td><td>"
-			string = string + a[b]['role'] + "</td></tr>"
-		}
-		return(string)
-	}
 	// make an api call and on response render the html page.
-	CallApi('users').then(function(value) {
-		res.render('leagues.html', {"table": Table(value), "title": "Users", "user": req.session.user, "body": value})
+	CallApi('users').then(function(users) {
+		users = JSON.parse(users)
+		templateVar = resetTempVar()
+		templateVar['title'] = 'Users'
+		templateVar['users'] = users
+		for (var a in users) {
+			templateVar['users'][a]['role'] = roles(users[a])
+			// CallApi('teams/'+users[a]['team_id']).then(function(team) {
+			// 	team = JSON.parse(team)
+			// 	console.log(team['name'])
+			// 	templateVar['users'][a]['team_name'] = team['name']
+			// })
+		}
+			res.render('users.html', templateVar)
+	})
+})
+
+app.get('/user/:id', function(req, res) {
+	// make an api call and on response render the html page.
+	CallApi('users/'+req.params['id']).then(function(user) {
+		user = JSON.parse(user)
+		CallApi('teams/'+user['team_id']).then(function(team) {
+			team = JSON.parse(team)
+			templateVar = resetTempVar()
+			templateVar['title'] = 'Profile'
+			templateVar['username'] = user['username']
+			templateVar['team_id'] = user['team_id']
+			templateVar['team_name'] = team['name']
+			templateVar['description'] = user['description']
+			templateVar['role'] = roles(user)
+			res.render('user.html', templateVar)
+		})
 	})
 })
 // show all leagues
 app.get('/leagues', function(req, res) {
-	// function to put together table for html page
-	function Table(a) {
-		a = JSON.parse(a)// turn a into object otherwise it is a string
-		string = "<tr><th>Id</th><th>Name</th><th>Owner</th><th>Entry Fee</th><th>Description</th></tr>";
-		for (var b in a) {
-			string = string + "<tr><td>"
-			string = string + a[b]['id'] + "</td><td>"
-			string = string + "<a href='/league/" + a[b]['id'] + "'>" + a[b]['name'] + "</a></td><td>"
-			string = string + a[b]['owner_id'] + "</td><td>"
-			string = string + "$" + a[b]['entry_fee'] + "</td><td>"
-			string = string + a[b]['description'] + "</td></tr>"
-		}
-		return(string)
-	}
 	// make an api call and on response render the html page.
 	CallApi('leagues').then(function(value) {
-		res.render('leagues.html', {"table": Table(value), "title": "Leagues", "user": req.session.user, "id": req.session.user_id, "key": req.session.key})
-	})
+		templateVar = resetTempVar()
+		templateVar['title'] = 'Leagues'
+		templateVar['leagues'] = JSON.parse(value)
+		res.render('leagues.html', templateVar)	})
 })
 
 // show one leagues
@@ -141,7 +181,7 @@ app.get('/league/:id', function(req, res) {
 		for (var b in a) {
 			string = string + "<tr><td>"
 			string = string + a[b]['id'] + "</td><td>"
-			string = string + "<a href='/teams/" + a[b]['id'] + "'>" + a[b]['name'] + "</a></td><td>"
+			string = string + "<a href='/team/" + a[b]['id'] + "'>" + a[b]['name'] + "</a></td><td>"
 			string = string + a[b]['owner_id'] + "</td><td>"
 			string = string + a[b]['description'] + "</td><td>"
 			string = string + "<button type=button value=" + a[b]['id'] + " class='removeLeagueTeam'>Kick</button></td></tr>"
@@ -200,33 +240,26 @@ app.get('/league/:id/edit', function(req, res) {
 
 // show all teams
 app.get('/teams', function(req, res) {
-	// function to put together table for html page
-	function Table(a) {
-		a = JSON.parse(a)// turn a into object otherwise it is a string
-		string = "<tr><th>Id</th><th>Name</th><th>Owner</th><th>Description</th></tr>";
-		for (var b in a) {
-			string = string + "<tr><td>"
-			string = string + a[b]['id'] + "</td><td>"
-			string = string + "<a href='/team/" + a[b]['id'] + "'>" + a[b]['name'] + "</a></td><td>"
-			string = string + a[b]['owner_id'] + "</td><td>"
-			string = string + a[b]['description'] + "</td></tr>"
-		}
-		return(string)
-	}
 	// make an api call and on response render the html page.
-	CallApi('teams').then(function(body){
-		res.render('leagues.html', {"table": Table(body), "title": "Teams", "user": req.session.user, "body": body})
+	CallApi('teams').then(function(value){
+		templateVar = resetTempVar()
+		templateVar['title'] = 'Teams'
+		templateVar['teams'] = JSON.parse(value)
+		res.render('teams.html', templateVar)
 	})
 })
 
-// show one team
-// app.get('/team/:id', function(req, res) {
-// 	// make an api call and on response render the html page.
-// 	CallApi('teams/'+req.params['id'], function(body){
-// 		tbody = JSON.parse(body)
-// 		res.render('leagues.html', {"title": "League", "user": "Placeholder", "body": body, "name": tbody['name'], "owner": tbody['owner_id'], "description": tbody['description'], "file": "deleteLeague.js"})
-// 	})
-// })
+//show one team
+app.get('/team/:id', function(req, res) {
+	// make an api call and on response render the html page.
+	CallApi('teams/'+req.params['id']).then(function(team){
+		team = JSON.parse(team)
+		templateVar = resetTempVar()
+		templateVar['name'] = team['name']
+		templateVar['description'] = team['description']
+		res.render('team.html', templateVar)
+	})
+})
 
 // new team
 app.get('/teams/new', function(req, res) {
@@ -236,6 +269,35 @@ app.get('/teams/new', function(req, res) {
 // edit league
 app.get('/team/:id/edit', function(req, res) {
 	res.render('teamForm.html', {"user": req.session.user, "file": "editTeam.js"})
+})
+
+app.get('/tournaments', function(req, res) {
+	// make an api call and on response render the html page.
+	CallApi('tournaments').then(function(value) {
+		templateVar = resetTempVar()
+		templateVar['title'] = 'Tournaments'
+		templateVar['tournaments'] = JSON.parse(value)
+		res.render('tournaments.html', templateVar)	})
+})
+
+app.get('/tournament/:id', function(req, res) {
+	// make an api call and on response render the html page.
+	CallApi('tournaments/'+req.params['id']).then(function(tourn) {
+		tourn = JSON.parse(tourn)
+		CallApi('tournaments/'+req.params['id']+'/brackets').then(function(brack) {
+			templateVar = resetTempVar()
+			templateVar['organizer_id'] = tourn['organizer_id']
+			templateVar['name'] = tourn['name']
+			templateVar['type'] = types(tourn)
+			templateVar['size'] = tourn['size']
+			templateVar['start_date'] = tourn['start_date']
+			templateVar['end_date'] = tourn['end_date']
+			templateVar['entry_fee'] = tourn['entry_fee']
+			templateVar['description'] = tourn['description']
+			templateVar['brack'] = JSON.parse(brack)
+			res.render('tournament.html', templateVar)	
+		})
+	})
 })
 
 app.listen(port)

@@ -1,0 +1,21 @@
+{{> _head}}
+<style>
+.title {
+	text-align: center;
+}
+.table {
+	margin: auto;
+	margin-top: 20px;
+}
+</style>
+<body>
+	{{> _header}}
+	<div class="body">
+		<h1 class="title">{{title}}</h1>
+		<h2>{{username}}</h2>
+		<p>{{role}}</p>
+		<h2><a href='/team/{{team_id}}'>{{team_name}}</a></h2>
+		<p>{{description}}</p>
+	</div>
+</body>
+</html>

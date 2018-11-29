@@ -24,7 +24,7 @@ class Requests(unittest.TestCase):
         conn.commit()
 
     def test_get_brackets(self):
-        result = [{"id": 3, "tournament_id": 1, "team_id": 3, "place": 1, "games_won": 2, "games_tied": 0, "games_lost": 0, "games_played": 2, "score": None}, {"id": 2, "tournament_id": 1, "team_id": 2, "place": 2, "games_won": 1, "games_tied": 0, "games_lost": 1, "games_played": 2, "score": None}, {"id": 1, "tournament_id": 1, "team_id": 1, "place": 3, "games_won": 1, "games_tied": 0, "games_lost": 1, "games_played": 2, "score": None}, {"id": 4, "tournament_id": 1, "team_id": 4, "place": 4, "games_won": 0, "games_tied": 0, "games_lost": 2, "games_played": 2, "score": None}]
+        result = [{"id": 3, "tournament_id": 1, "team_id": 3, "place": 1, "games_won": 2, "games_tied": 0, "games_lost": 0, "score": None, "games_played": 2}, {"id": 2, "tournament_id": 1, "team_id": 2, "place": 2, "games_won": 1, "games_tied": 0, "games_lost": 1, "score": None, "games_played": 2}, {"id": 1, "tournament_id": 1, "team_id": 1, "place": 3, "games_won": 1, "games_tied": 0, "games_lost": 1, "score": None, "games_played": 2}, {"id": 4, "tournament_id": 1, "team_id": 4, "place": 4, "games_won": 0, "games_tied": 0, "games_lost": 2, "score": None, "games_played": 2}]
         r = requests.get(url + 'tournaments/1/brackets')
         self.assertEqual(result, r.json())
 
@@ -34,12 +34,12 @@ class Requests(unittest.TestCase):
         self.assertEqual(result, r.json())
 
     def test_post_bracket(self):
-        r = requests.post(url + 'tournaments/2/brackets', data={"team_id": 3, "place": 1, "games_won": 0, "games_tied": 0, "games_lost": 0, "games_played": 0, "score": None})
+        r = requests.post(url + 'tournaments/2/brackets', data={"team_id": 3, "tournament_id": 2, "place": 1}, headers={'organizer_key':'root'})
         self.assertEqual(200, r.status_code)
 
     def test_edit_bracket(self):
-        result = [{"id": 3, "tournament_id": 1, "team_id": 3, "place": 1, "games_won": 2, "games_tied": 0, "games_lost": 0, "games_played": 2, "score": None}, {"id": 2, "tournament_id": 1, "team_id": 2, "place": 2, "games_won": 1, "games_tied": 0, "games_lost": 1, "games_played": 2, "score": None}, {"id": 1, "tournament_id": 1, "team_id": 1, "place": 3, "games_won": 1, "games_tied": 0, "games_lost": 1, "games_played": 2, "score": None}, {"id": 4, "tournament_id": 1, "team_id": 4, "place": 4, "games_won": 0, "games_tied": 0, "games_lost": 2, "games_played": 2, "score": None}]
-        r = requests.put(url + 'tournaments/1/brackets/1', data={"place": 2, "games_won": 2, "games_tied": 0, "games_lost": 1, "games_played": 3}, headers={'request_key':'root'})
+        result = [{'id': 3, 'tournament_id': 1, 'team_id': 3, 'place': 1, 'games_won': 2, 'games_tied': 0, 'games_lost': 0, 'score': None, 'games_played': 2}, {'id': 1, 'tournament_id': 1, 'team_id': 1, 'place': 2, 'games_won': 2, 'games_tied': 0, 'games_lost': 1, 'score': None, 'games_played': 3}, {'id': 2, 'tournament_id': 1, 'team_id': 2, 'place': 2, 'games_won': 1, 'games_tied': 0, 'games_lost': 1, 'score': None, 'games_played': 2}, {'id': 4, 'tournament_id': 1, 'team_id': 4, 'place': 4, 'games_won': 0, 'games_tied': 0, 'games_lost': 2, 'score': None, 'games_played': 2}]
+        r = requests.put(url + 'tournaments/1/brackets/1', data={"place": 2, "games_won": 2, "games_tied": 0, "games_lost": 1, "games_played": 3}, headers={'organizer_key':'root'})
         r2 = requests.get(url + 'tournaments/1/brackets')
         self.assertEqual(200, r.status_code)
         self.assertEqual(result, r2.json())
@@ -49,3 +49,6 @@ class Requests(unittest.TestCase):
         r2 = requests.get(url + 'tournaments/1/brackets/1')
         self.assertEqual(200, r.status_code)
         self.assertEqual(404, r2.status_code)
+
+if __name__ == '__main__':
+    unittest.main()

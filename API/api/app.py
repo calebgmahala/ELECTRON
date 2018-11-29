@@ -78,7 +78,7 @@ league_keys = [
 	'id',
 	'name',
 	'owner_id',
-	'organizer_key'
+	'organizer_key',
 	'entry_fee',
 	'description']
 team_keys = [
@@ -119,7 +119,6 @@ bracket_keys = [
 	'games_won',
 	'games_tied',
 	'games_lost',
-	'points',
 	'score'
 ]
 
@@ -192,6 +191,7 @@ def User(id):
 		elif not check_auth('users', 'request_key', 'id', id) and not check_auth('users', 'request_key', 'id', 'team_id'):
 			return Response(status=409)
 		else:
+			cur.execute('DELETE FROM brackets WHERE 1=1')
 			cur.execute('DELETE FROM organizers_teams WHERE organizer_id=%d' % id)
 			cur.execute('DELETE FROM tournaments WHERE organizer_id=%d' % id )			
 			cur.execute('DELETE FROM organizers WHERE id=%d' % id )
@@ -221,8 +221,6 @@ def Login():
 	elif request.method == 'DELETE':
 		body = json.dumps(request.form)
 		body = json.loads(body)
-		print(body)
-		print(request.headers.get('request_key'))
 		cur.execute("SELECT * FROM users WHERE id="+str(body['id']))
 		usr = cur.fetchone()
 		if usr is None:
@@ -291,6 +289,8 @@ def League(id):
 		elif check_auth('users', 'request_key', 'id', '(SELECT owner_id FROM organizers WHERE id=' + str(id) + ')') or check_auth('users', 'request_key', 'permission', 2):
 			try:
 				body['organizer_key'] = bcrypt.hashpw( body['organizer_key'].encode("utf-8"), bcrypt.gensalt()).decode('utf-8')
+			except:
+				pass
 			body['entry_fee'] = int(body['entry_fee'])
 			cur.execute('UPDATE organizers SET ' + put_post(league_keys, ['id'], body, 'PUT') + ' WHERE id=' + str(body['id']))
 			conn.commit()
@@ -302,6 +302,7 @@ def League(id):
 		if (cur.fetchone() is None):
 			return Response(status=404)
 		elif check_auth('users', 'request_key', 'id', '(SELECT owner_id FROM organizers WHERE id=' + str(id) + ')') or check_auth('users', 'request_key', 'permission', 2):
+			cur.execute('DELETE FROM brackets WHERE 1=1')
 			cur.execute('DELETE FROM organizers_teams WHERE organizer_id=%d' % id)
 			cur.execute('DELETE FROM tournaments WHERE organizer_id=%d' % id )			
 			cur.execute('DELETE FROM organizers WHERE id=%d' % id )
@@ -394,7 +395,7 @@ def LeagueTeam(org_id, t_id):
 		team = cur.fetchone()
 		if team is not None:
 			body['id'] = team[0]
-			if check_auth('users', 'request_key', 'id', '(SELECT owner_id FROM organizers WHERE id=' + str(org_id) + ')'):
+			if check_auth('users', 'request_key', 'id', '(SELECT owner_id FROM organizers WHERE id=' + str(org_id) + ')') or check_auth('organizers', 'organizer_key', 'id', str(org_id)):
 				cur.execute('UPDATE organizers_teams SET ' + put_post(organizer_team_keys, ['id','organizer_id','team_id'], body, 'PUT') + ' WHERE id=' + str(body['id']))
 				conn.commit()
 				return Response(status=200)			
@@ -403,8 +404,8 @@ def LeagueTeam(org_id, t_id):
 		else:
 			return Response(status=404)
 	elif request.method == 'DELETE':
-		if check_auth('users', 'request_key', 'id', '(SELECT owner_id FROM organizers WHERE id=' + str(org_id) + ')') or check_auth('users', 'request_key', 'team_id', str(t_id) + ' AND is_owner_team=1'):
-			cur.execute('SELECT * FROM teams WHERE id=%d' % t_id)
+		if check_auth('users', 'request_key', 'id', '(SELECT owner_id FROM organizers WHERE id=' + str(org_id) + ')') or check_auth('users', 'request_key', 'team_id', str(t_id) + ' AND is_owner_team=1') or check_auth('organizers', 'organizer_key', 'id', str(org_id)):
+			cur.execute('SELECT * FROM teams WHERE id='+str(t_id))
 			if (cur.fetchone() is None):
 				return Response(status=404)
 			else:
@@ -453,18 +454,27 @@ def Teams():
 	elif request.method == 'POST':
 		body = json.dumps(request.form)
 		body = json.loads(body)
-		try:
-			body['team_key'] = bcrypt.hashpw( body['team_key'].encode("utf-8"), bcrypt.gensalt()).decode('utf-8')
-			cur.execute('INSERT INTO teams ' + put_post(team_keys, ['id'], body, 'POST'))
-			conn.commit()
-			return Response(status=200)
-		except (mysql.connector.Error, KeyError) as err:
+		if 'user_id' not in body.keys():
 			return Response(status=404)
+		elif check_auth('users', 'request_key', 'id', str(body['user_id'])):
+			try:
+				body['team_key'] = bcrypt.hashpw( body['team_key'].encode("utf-8"), bcrypt.gensalt()).decode('utf-8')
+				cur.execute('INSERT INTO teams ' + put_post(team_keys, ['id'], body, 'POST'))
+				cur.execute('SELECT LAST_INSERT_ID()')
+				team = cur.fetchone()
+				cur.execute("UPDATE users SET team_id="+str(team[0])+", is_owner_team=1 WHERE id="+body['user_id'])
+				conn.commit()
+				return Response(status=200)
+			except (mysql.connector.Error, KeyError) as err:
+				return Response(status=404)
+		else:
+			return Response(status=409)
 
 @app.route("/teams/<int:id>", methods=['GET', 'PUT', 'DELETE'])
 def Team(id):
 	conn.commit() # allows reload for testing otherwise database is not refreshed
 	if request.method == 'GET':
+		print(id)
 		# get team
 		cur.execute("SELECT * FROM teams WHERE id=%d" % id)
 		team = cur.fetchone()
@@ -474,6 +484,7 @@ def Team(id):
 			return resp
 		else:
 			show_results(team_keys, resp, team, notkeys=['team_key'])
+			print('done')
 			return json.dumps(resp)
 	elif request.method == 'PUT':
 		cur.execute('SELECT * FROM teams WHERE id='+str(id))
@@ -482,22 +493,29 @@ def Team(id):
 		body['id'] = id
 		if cur.fetchone() is None:
 			return Response(status=404)
-		else:
+		elif check_auth('users', 'request_key', 'team_id', str(id)+' AND is_owner_team=1'):
 			try:
 				body['team_key'] = bcrypt.hashpw( body['team_key'].encode("utf-8"), bcrypt.gensalt()).decode('utf-8')
+			except:
+				pass
 			cur.execute('UPDATE teams SET ' + put_post(team_keys, ['id'], body, 'PUT') + ' WHERE id=' + str(body['id']))
 			conn.commit()
 			return Response(status=200)
+		else:
+			return Response(status=409)
 	elif request.method == 'DELETE':
 		cur.execute('SELECT * FROM teams WHERE id=%d' % id)
 		if (cur.fetchone() is None):
 			return Response(status=404)
-		else:
-			cur.execute('DELETE FROM organizers_teams WHERE team_id=%d' % id)
-			cur.execute('UPDATE users SET team_id=Null WHERE team_id=%d' % id )
-			cur.execute('DELETE FROM teams WHERE id=%d' % id )
+		elif check_auth('users', 'request_key', 'team_id', str(id)+' AND is_owner_team=1'):
+			cur.execute('DELETE FROM brackets WHERE 1=1')
+			cur.execute('DELETE FROM organizers_teams WHERE team_id='+str(id))
+			cur.execute('UPDATE users SET team_id=Null WHERE team_id='+str(id))
+			cur.execute('DELETE FROM teams WHERE id='+str(id))
 			conn.commit()
-			return Response(status=200)	
+			return Response(status=200)
+		else:
+			return Response(status=409)
 
 @app.route("/teams/<int:id>/leagues", methods=['GET', 'DELETE'])
 def TeamLeagues(id):
@@ -515,7 +533,7 @@ def TeamLeagues(id):
 		else:
 			for a in range(len(team)):
 				obj = {}
-				show_results(league_keys, obj, team, a)
+				show_results(league_keys, obj, team, a, ['organizer_key'])
 				resp.append(obj)
 			return json.dumps(resp)
 	elif request.method == 'DELETE':
@@ -549,7 +567,9 @@ def Tournaments():
 	elif request.method == 'POST':
 		body = json.dumps(request.form)
 		body = json.loads(body)
-		if check_auth('organizers', 'organizer_key', 'id', '(SELECT org)'):
+		if 'organizer_id' not in body.keys():
+			return Response(status=404)
+		elif check_auth('users', 'request_key', 'id', '(SELECT owner_id FROM organizers WHERE id =' + body['organizer_id'] + ')') or check_auth('organizers', 'organizer_key', 'id', body['organizer_id']):
 			try: 
 				body['entry_fee'] = int(body['entry_fee'])
 				cur.execute('INSERT INTO tournaments ' + put_post(tournament_keys, ['id', 'end_date'], body, 'POST'))
@@ -559,7 +579,7 @@ def Tournaments():
 				return Response(status=404)
 		else:
 			return Response(status=409)
-
+			
 @app.route("/tournaments/<int:id>", methods=['GET', 'PUT', 'DELETE'])
 def Tournament(id):
 	conn.commit() # allows reload for testing otherwise database is not refreshed
@@ -583,7 +603,7 @@ def Tournament(id):
 		body['id'] = id
 		if cur.fetchone() is None:
 			return Response(status=404)
-		elif check_auth('users', 'request_key', 'id', '(SELECT owner_id FROM organizers WHERE id=(SELECT organizer_id FROM tournaments WHERE id=' + str(id) + '))') or check_auth('users', 'request_key', 'permission', 2):
+		elif check_auth('organizers', 'organizer_key', 'id', str(id)) or check_auth('users', 'request_key', 'id', '(SELECT owner_id FROM organizers WHERE id =(SELECT organizer_id FROM tournaments WHERE id=' + str(id) +')) OR permission=2'):
 			body['entry_fee'] = int(body['entry_fee'])
 			cur.execute("UPDATE tournaments SET " + put_post(tournament_keys, ['id'], body, 'PUT') + " WHERE id=" + str(body['id']))
 			conn.commit()
@@ -594,7 +614,8 @@ def Tournament(id):
 		cur.execute('SELECT * FROM tournaments WHERE id=%d' % id)
 		if (cur.fetchone() is None):
 			return Response(status=404)
-		elif check_auth('users', 'request_key', 'id', '(SELECT owner_id FROM organizers WHERE id=(SELECT organizer_id FROM tournaments WHERE id=' + str(id) + '))') or check_auth('users', 'request_key', 'permission', 2):
+		elif check_auth('organizers', 'organizer_key', 'id', str(id)) or check_auth('users', 'request_key', 'id', '(SELECT owner_id FROM organizers WHERE id =(SELECT organizer_id FROM tournaments WHERE id=' + str(id) +')) OR permission=2'):
+			cur.execute('DELETE FROM brackets WHERE 1=1')
 			cur.execute('DELETE FROM tournaments WHERE id=%d' % id )
 			conn.commit()
 			return Response(status=200)	
@@ -607,24 +628,62 @@ def Brackets(id):
 	if request.method == 'GET':
 		# get all brackets
 		resp = []
-		cur.execute("SELECT * FROM brackets")
+		cur.execute("SELECT * FROM brackets ORDER BY place")
 		brak = cur.fetchall()
 		for a in range(len(brak)):
 			obj = {}
-			show_results(brak_keys, obj, brak, a)
+			show_results(bracket_keys, obj, brak, a)
 			obj['games_played'] = obj['games_won']+obj['games_tied']+obj['games_lost']
-			resp.append(obj)		
+			resp.append(obj)	
 		return json.dumps(resp)
 	elif request.method == 'POST':
 		body = json.dumps(request.form)
 		body = json.loads(body)
-		if check_auth('users', 'request_key', 'id', '(SELECT league_key FROM organizers WHERE id='):
+		if check_auth('organizers', 'organizer_key', 'id', '(SELECT organizer_id FROM tournaments WHERE id=' + str(id) + ')') or check_auth('users', 'request_key', 'id', '(SELECT owner_id FROM organizers WHERE id =(SELECT organizer_id FROM tournaments WHERE id=' + str(id) +'))'):
 			try: 
-				body['entry_fee'] = int(body['entry_fee'])
-				cur.execute('INSERT INTO organizers ' + put_post(league_keys, ['id'], body, 'POST'))
+				cur.execute('INSERT INTO brackets ' + put_post(bracket_keys, ['id', 'games_won', 'games_tied', 'games_lost', 'score'], body, 'POST'))
 				conn.commit()
 				return Response(status=200)
 			except (mysql.connector.Error, KeyError) as err:
 				return Response(status=404)
 		else:
+			return Response(status=409)
+
+@app.route("/tournaments/<int:t_id>/brackets/<int:brak_id>", methods=['GET', 'PUT', 'DELETE'])
+def Bracket(t_id, brak_id):
+	conn.commit() # allows reload for testing otherwise database is not refreshed
+	if request.method == 'GET':
+		# get organizer
+		cur.execute("SELECT * FROM brackets WHERE id="+str(brak_id))
+		brak = cur.fetchone()
+		resp = {}
+		if (brak is None):
+			resp = Response(status=404)
+			return resp
+		else:
+			show_results(bracket_keys, resp, brak)
+			resp['games_played'] = resp['games_won']+resp['games_tied']+resp['games_lost']
+			return json.dumps(resp)
+	elif request.method == 'PUT':
+		cur.execute('SELECT * FROM brackets WHERE id='+str(brak_id))
+		body = json.dumps(request.form)
+		body = json.loads(body)
+		body['id'] = brak_id
+		if cur.fetchone() is None:
+			return Response(status=404)
+		elif check_auth('organizers', 'organizer_key', 'id', '(SELECT organizer_id FROM tournaments WHERE id=' + str(t_id) + ')') or check_auth('users', 'request_key', 'id', '(SELECT owner_id FROM organizers WHERE id =(SELECT organizer_id FROM tournaments WHERE id=' + str(t_id) +'))'):
+			cur.execute('UPDATE brackets SET ' + put_post(bracket_keys, ['id'], body, 'PUT') + ' WHERE id=' + str(body['id']))
+			conn.commit()
+			return Response(status=200)
+		else:
+			return Response(status=409)
+	elif request.method == 'DELETE':
+		cur.execute('SELECT * FROM brackets WHERE id=' + str(brak_id))
+		if (cur.fetchone() is None):
+			return Response(status=404)
+		elif check_auth('organizers', 'organizer_key', 'id', '(SELECT organizer_id FROM tournaments WHERE id=' + str(t_id) + ')') or check_auth('users', 'request_key', 'id', '(SELECT owner_id FROM organizers WHERE id =(SELECT organizer_id FROM tournaments WHERE id=' + str(t_id) +'))'):
+			cur.execute('DELETE FROM brackets WHERE id='+str(brak_id))
+			conn.commit()
+			return Response(status=200)
+		else:	
 			return Response(status=409)

@@ -39,18 +39,18 @@ class Requests(unittest.TestCase):
         self.assertEqual(result, r.json())
 
     def test_post_team(self):
-        r = requests.post(url + 'teams', data={"name": "Test", "description": "Test", "team_key": 'root'})
+        r = requests.post(url + 'teams', data={"name": "Test", "description": "Test", "team_key": 'root', "user_id": 1}, headers={"request_key":"root"})
         self.assertEqual(200, r.status_code)
 
     def test_edit_team(self):
         result = {"id": 1, "name": "Test", "description": "Test"}
-        r = requests.put(url + 'teams/1', data={"name": "Test", "description": "Test"})
+        r = requests.put(url + 'teams/1', data={"name": "Test", "description": "Test"}, headers={'request_key': 'root'})
         r2 = requests.get(url + 'teams/1')
         self.assertEqual(200, r.status_code)
         self.assertEqual(result, r2.json())
 
     def test_delete_team(self):
-        r = requests.delete(url + 'teams/1')
+        r = requests.delete(url + 'teams/1', headers={'request_key':'root'})
         r2 = requests.get(url + 'teams/1')
         self.assertEqual(200, r.status_code)
         self.assertEqual(404, r2.status_code)

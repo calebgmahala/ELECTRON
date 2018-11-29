@@ -15,20 +15,28 @@
 		<table class="table">
 			<tr>
 				<th>Id</th>
+				<th>Organizer Id</th>
 				<th>Name</th>
-				<th>Owner_Id</th>
+				<th>Type</th>
+				<th>Size</th>
+				<th>Start Date</th>
+				<th>End Date</th>
 				<th>entry_fee</th>
 				<th>Description</th>
 			</tr>
-			{{#leagues}}
+			{{#tournaments}}
 				<tr>
 					<td>{{id}}</td>
-					<td><a href='/league/{{id}}'>{{name}}</td>
-					<td><a href='/user/{{owner_id}}'>{{owner_id}}</a></td>
+					<td><a href='/league/{{id}}'>{{organizer_id}}</a></td>
+					<td><a href='/tournament/{{id}}'>{{name}}</a></td>
+					<td>{{type}}</td>
+					<td>{{size}}</td>
+					<td>{{start_date}}</td>
+					<td>{{end_date}}</td>
 					<td>${{entry_fee}}</td>
 					<td>{{description}}</td>
 				</tr>
-			{{/leagues}}
+			{{/tournaments}}
 		</table>
 	</div>
 </body>

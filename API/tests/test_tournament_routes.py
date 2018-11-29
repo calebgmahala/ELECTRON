@@ -34,7 +34,7 @@ class Requests(unittest.TestCase):
         self.assertEqual(result, r.json())
 
     def test_post_tournament(self):
-        r = requests.post(url + 'tournaments', data={"name": "Test", "type": 1, "organizer_id": 1, "size": 4, "start_date": "2018-12-30 20:00:00", "entry_fee": 1000, "description": "Test"}, headers={'request_key':'root'})
+        r = requests.post(url + 'tournaments', data={"name": "Test", "type": 1, "organizer_id": 1, "size": 4, "start_date": "2018-12-30 20:00:00", "entry_fee": 1000, "description": "Test"}, headers={'organizer_key':'root'})
         self.assertEqual(200, r.status_code)
 
     def test_edit_tournament(self):
