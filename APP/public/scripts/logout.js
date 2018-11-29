@@ -8,7 +8,7 @@ $(document).ready(function() {
         window.location.replace("/login");
       },
       error: function() {
-        alert('error during login')
+        alert('error during logout')
       }
     });
   });

@@ -16,19 +16,15 @@
 			<tr>
 				<th>Id</th>
 				<th>Name</th>
-				<th>Owner_Id</th>
-				<th>entry_fee</th>
 				<th>Description</th>
 			</tr>
-			{{#leagues}}
+			{{#teams}}
 				<tr>
 					<td>{{id}}</td>
-					<td><a href='/league/{{id}}'>{{name}}</td>
-					<td><a href='/user/{{owner_id}}'>{{owner_id}}</a></td>
-					<td>${{entry_fee}}</td>
+					<td><a href='/team/{{id}}'>{{name}}</td>
 					<td>{{description}}</td>
 				</tr>
-			{{/leagues}}
+			{{/teams}}
 		</table>
 	</div>
 </body>

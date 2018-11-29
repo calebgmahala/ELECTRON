@@ -3,6 +3,7 @@ function removeTeam() {
   $.ajax({
     type: "DELETE",
     url: "http://localhost:5000/teams/" + id,
+    headers: {"request_key": $(this).data('key') },
     success: function() {
       window.location.replace("/teams");
     },

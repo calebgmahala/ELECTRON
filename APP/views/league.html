@@ -28,7 +28,7 @@ h2 {
 				<p>Owner: {{owner}}</p>
 				<p>{{description}}</p>
 				<p class="money">${{entry_fee}}</p>
-				<input type="button" value="Delete" onclick="removeLeague()">
+				<input id="deleteLeague" type="button" value="Delete" data-key="{{key}}">
 			</div>
 			{{{tournaments}}}
 		</div>
@@ -41,6 +41,8 @@ h2 {
 			{{{teams_request}}}
 		</table>
 	</div>
-	<script type="text/javascript" src="/scripts/League.js"></script>
+	{{#files}}
+	<script type="text/javascript" src="/scripts/{{.}}"></script>
+	{{/files}}
 </body>
 </html>

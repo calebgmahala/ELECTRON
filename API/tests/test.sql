@@ -1,4 +1,5 @@
 USE test;
+DELETE FROM `brackets` WHERE 1=1;
 DELETE FROM `organizers_teams` WHERE 1=1;
 DELETE FROM `tournaments` WHERE 1=1;
 DELETE FROM `organizers` WHERE 1=1;
@@ -13,7 +14,7 @@ INSERT INTO `users` (`id`, `username`, `password`, `team_id`, `request_key`, `pe
 INSERT INTO `users` (`id`, `username`, `password`, `team_id`, `description`, `role`) VALUES(3, 'Gucci', '$2b$12$3uvat8KCq5K0okD.lBIPROOYDOqT7J12p.hNFZs/E2lXNCfR/u/8m', 1, 'I like shaggy', 2);
 INSERT INTO `organizers` VALUES(1, 'Ignis', 1, '$2b$12$3uvat8KCq5K0okD.lBIPROOYDOqT7J12p.hNFZs/E2lXNCfR/u/8m', 100, 'Best place to play!');
 INSERT INTO `organizers` VALUES(2, 'VGL', 2, '$2b$12$3uvat8KCq5K0okD.lBIPROOYDOqT7J12p.hNFZs/E2lXNCfR/u/8m', 1000, 'Second Best place to play!');
-INSERT INTO `tournaments` VALUES(1, 1, 'New Year', 2, '$2b$12$3uvat8KCq5K0okD.lBIPROOYDOqT7J12p.hNFZs/E2lXNCfR/u/8m', 8, '2018-1-1 8:00:00', '2018-1-20', 100000, 'New year special');
+INSERT INTO `tournaments` VALUES(1, 1, 'New Year', 2, 8, '2018-1-1 8:00:00', '2018-1-20', 100000, 'New year special');
 INSERT INTO `tournaments` (`id`, `organizer_id`, `name`, `type`, `size`, `start_date`, `entry_fee`, `description`) VALUES(2, 1, 'Christmas', 1, 4, '2018-12-25 12:30:00', 500, 'Christmas special');
 INSERT INTO `organizers_teams` VALUES(1, 1, 1, 0);
 INSERT INTO `organizers_teams` VALUES(2, 1, 2, 0);

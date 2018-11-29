@@ -4,7 +4,7 @@
 <body>
   {{> _header}}
   <div class="body">
-    <form id='leagueForm'>
+    <form id='leagueForm' data-key='{{key}}'>
       <div class="form-group">
         <label for="name">Name</label>
         <input name="name" type="text" id="name" placeholder="Enter name">
@@ -13,6 +13,11 @@
         <label for="entry_fee">Entry Fee</label>
         <input name="entry_fee" type="number" id="entry_fee">
       </div>
+      <div class="form-group">
+        <label for="organizer_key">Organizer_key</label>
+        <input name="organizer_key" type="text" id="organizer_key">
+      </div>
+      <input name="owner_id" type="hidden" value="{{id}}">
       <textarea rows="4" cols="50" id="description" name="description" form="leagueForm">Description</textarea>
       <button type="submit">Submit</button>
     </form>

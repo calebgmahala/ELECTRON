@@ -4,11 +4,12 @@
 <body>
   {{> _header}}
   <div class="body">
-    <form id='teamForm'>
+    <form id='teamForm'  data-key='{{key}}'>
       <div class="form-group">
         <label for="name">Name</label>
         <input name="name" type="text" id="name" placeholder="Enter name">
       </div>
+      <input name="owner_id" type="hidden" value="{{id}}">
       <textarea rows="4" cols="50" id="description" name="description" form="teamForm">Description</textarea>
       <button type="submit">Submit</button>
     </form>

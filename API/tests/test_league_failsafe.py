@@ -24,6 +24,7 @@ class FailRequests(unittest.TestCase):
         conn.commit()
 
     def test_fail_get_league(self):
+        cur.execute('DELETE FROM brackets WHERE 1=1')
         cur.execute('DELETE FROM `organizers_teams` WHERE 1=1;')
         cur.execute('DELETE FROM `tournaments` WHERE 1=1;')
         cur.execute('DELETE FROM `organizers` WHERE 1=1;')
@@ -32,6 +33,7 @@ class FailRequests(unittest.TestCase):
         self.assertEqual(404, r.status_code)
 
     def test_fail_get_league_tournaments(self):
+        cur.execute('DELETE FROM brackets WHERE 1=1')
         cur.execute('DELETE FROM `tournaments` WHERE 1=1;')
         conn.commit()
         r = requests.get(url + 'leagues/4/tournaments')
@@ -60,6 +62,7 @@ class FailRequests(unittest.TestCase):
         self.assertEqual(409, r.status_code)
 
     def test_fail_edit_league(self):
+        cur.execute('DELETE FROM brackets WHERE 1=1')
         cur.execute('DELETE FROM `organizers_teams` WHERE 1=1;')
         cur.execute('DELETE FROM `tournaments` WHERE 1=1;')
         cur.execute('DELETE FROM `organizers` WHERE 1=1;')
@@ -78,6 +81,7 @@ class FailRequests(unittest.TestCase):
         self.assertEqual(404, r.status_code)
 
     def test_fail_delete_league(self):
+        cur.execute('DELETE FROM brackets WHERE 1=1')
         cur.execute('DELETE FROM `organizers_teams` WHERE 1=1;')
         cur.execute('DELETE FROM `tournaments` WHERE 1=1;')
         cur.execute('DELETE FROM `organizers` WHERE 1=1;')
