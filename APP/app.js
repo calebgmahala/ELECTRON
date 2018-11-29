@@ -158,7 +158,8 @@ app.get('/leagues', function(req, res) {
 		templateVar = resetTempVar()
 		templateVar['title'] = 'Leagues'
 		templateVar['leagues'] = JSON.parse(value)
-		res.render('leagues.html', templateVar)	})
+		res.render('leagues.html', templateVar)	
+	})
 })
 
 // show one leagues
@@ -184,7 +185,7 @@ app.get('/league/:id', function(req, res) {
 			string = string + "<a href='/team/" + a[b]['id'] + "'>" + a[b]['name'] + "</a></td><td>"
 			string = string + a[b]['owner_id'] + "</td><td>"
 			string = string + a[b]['description'] + "</td><td>"
-			string = string + "<button type=button value=" + a[b]['id'] + " class='removeLeagueTeam'>Kick</button></td></tr>"
+			string = string + "<button type=button value=" + a[b]['id'] + " class='removeLeagueTeam' data-key='{{key}}'>Kick</button></td></tr>"
 		}
 		return(string)
 	}
@@ -197,7 +198,7 @@ app.get('/league/:id', function(req, res) {
 			string = string + "<a href='/teams/" + a[b]['id'] + "'>" + a[b]['name'] + "</a></td><td>"
 			string = string + a[b]['owner_id'] + "</td><td>"
 			string = string + a[b]['description'] + "</td><td>"
-			string = string + "<button type=button value=" + a[b]['id'] + " class='removeLeagueTeam'>Reject</button><button type=button value=" + a[b]['id'] + " class='editLeagueTeam'>Accept</button></td></tr>"
+			string = string + "<button type=button value=" + a[b]['id'] + " class='removeLeagueTeam' data-key='{{key}}'>Reject</button><button type=button value=" + a[b]['id'] + " class='editLeagueTeam' data-key='{{key}}'>Accept</button></td></tr>"
 		}
 		return(string)
 	}
@@ -220,7 +221,8 @@ app.get('/league/:id', function(req, res) {
 						"teams_request": RequestsTable(requests),
 						"user": req.session.user, 
 						"id": req.session.user_id, 
-						"key": req.session.key
+						"key": req.session.key,
+						"files": ['deleteLeague.js', 'deleteLeagueTeam.js', 'editLeagueTeam.js', 'logout.js']
 					})
 				})
 			})
@@ -230,12 +232,12 @@ app.get('/league/:id', function(req, res) {
 
 // new league
 app.get('/leagues/new', function(req, res) {
-	res.render('leagueForm.html', {"user": req.session.user, "file": "newLeague.js"})
+	res.render('leagueForm.html', {"user": req.session.user, "key": req.session.key, "id": req.session.user_id, "file": "newLeague.js"})
 })
 
 // edit league
 app.get('/league/:id/edit', function(req, res) {
-	res.render('leagueForm.html', {"user": req.session.user, "file": "editLeague.js"})
+	res.render('leagueForm.html', {"user": req.session.user, "key": req.session.key, "id": req.session.user_id, "file": "editLeague.js"})
 })
 
 // show all teams
@@ -263,12 +265,12 @@ app.get('/team/:id', function(req, res) {
 
 // new team
 app.get('/teams/new', function(req, res) {
-	res.render('teamForm.html', {"user": req.session.user, "file": "newTeam.js"})
+	res.render('teamForm.html', {"user": req.session.user, "key": req.session.key, "id": req.session.user_id, "file": "newTeam.js"})
 })
 
 // edit league
 app.get('/team/:id/edit', function(req, res) {
-	res.render('teamForm.html', {"user": req.session.user, "file": "editTeam.js"})
+	res.render('teamForm.html', {"user": req.session.user,  "key": req.session.key, "id": req.session.user_id, "file": "editTeam.js"})
 })
 
 app.get('/tournaments', function(req, res) {
