@@ -1,0 +1,47 @@
+.login-body {
+	background-color: darkgrey;
+}
+.login-hero {
+		position: absolute;
+		top: 0;
+		left: 0;
+		height: 100%;
+		width: 100%;
+		object-fit: cover;
+		opacity: .7;
+		z-index: -1;
+	}
+.body_login {
+	position: absolute;
+	width: 100%;
+	height: 70%;
+	form {
+		width: 50%;
+		position: absolute;
+		top: 10%;
+		padding-top: 50px;
+		padding-bottom: 50px;
+		padding-left: 20px;
+		padding-right: 20px;
+		margin-left: 25%;
+		margin-right: 25%;
+		    display: block;
+    border-radius: 10px;
+    box-shadow: 2px 5px 10px lightblue;
+    border: 1px solid black;
+    background-image: linear-gradient(to bottom, lightgray 0, white 100%);
+		.form-group {
+			font-size: 20px;
+			padding-bottom: 10px;
+			padding-top: 10px;
+			margin: 0 auto;
+			width: fit-content;
+		}
+		button {
+			border: none;
+			border-radius: 5px;
+			background-color: white;
+		}
+
+	}	
+}

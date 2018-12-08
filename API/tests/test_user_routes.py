@@ -47,9 +47,9 @@ class Requests(unittest.TestCase):
         self.assertEqual(result, r2.json())
 
     def test_put_user_team_id(self):
-        cur.execute('UPDATE users SET team_id=Null WHERE id=1')
+        cur.execute('UPDATE users SET team_id=Null, is_owner_team=0 WHERE id=1')
         conn.commit()
-        result = {"id": 1, "username": "Caleb", "permission": 2, "team_id": 1, "is_owner_team": 1, "description": "Just your average player", "role": 1}
+        result = {"id": 1, "username": "Caleb", "permission": 2, "team_id": 1, "is_owner_team": 0, "description": "Just your average player", "role": 1}
         r = requests.put(url + 'users/1', headers={'request_key':'root', 'team_id': '1', 'team_key': 'root'})
         r2 = requests.get(url + 'users/1')
         self.assertEqual(200, r.status_code)

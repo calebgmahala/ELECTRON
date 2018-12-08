@@ -10,22 +10,22 @@
 </style>
 <body>
 	{{> _header}}
-	<div class="body">
-		<h1 class="title">{{title}}</h1>
-		<table class="table">
-			<tr>
-				<th>Id</th>
-				<th>Name</th>
-				<th>Description</th>
-			</tr>
-			{{#teams}}
+	<div class="body_user">
+		<div class="data">
+			<h1 class="title">{{title}}</h1>
+			<table class="table">
 				<tr>
-					<td>{{id}}</td>
-					<td><a href='/team/{{id}}'>{{name}}</td>
-					<td>{{description}}</td>
+					<th>Name</th>
+					<th>Description</th>
 				</tr>
-			{{/teams}}
-		</table>
+				{{#teams}}
+					<tr>
+						<td><a href='/team/{{id}}'>{{name}}</a></td>
+						<td>{{description}}</td>
+					</tr>
+				{{/teams}}
+			</table>
+		</div>
 	</div>
 </body>
 </html>

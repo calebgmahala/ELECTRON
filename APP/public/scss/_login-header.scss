@@ -1,0 +1,33 @@
+header {
+	display: block;
+}
+.header {
+	position: relative;
+	background-color: lightgrey;
+	height: 30vh;
+	min-height: 140px; 
+	width: 100%;
+	.logo {
+		display: inline-block;
+		max-width: 100px;
+		margin-top: 20px;
+		margin-left: 5%;
+		width: 20%;
+	}
+	.header-box {
+		position: absolute;
+		display: inline-block;
+		height: 100%;
+		width: 75%;
+		h1 {
+			font-family: 'Alegreya Sans SC', sans-serif;
+			letter-spacing: 10px;
+			display: block;
+			height: 100%;
+			line-height: 30vh;
+			font-size: 50px;
+			text-align: center;
+			color: black;
+		}
+	}
+}

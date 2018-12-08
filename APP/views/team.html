@@ -1,7 +1,16 @@
 {{> _head}}
 <style>
+.user-data > p {
+	margin-top: 10px;
+	margin-left: 20px;
+	font-family: 'Alegreya Sans SC', sans-serif;
+	font-size: 18px;
+}
 .title {
 	text-align: center;
+	margin-top: 20px;
+	font-family: 'Alegreya Sans SC', sans-serif;
+	font-size: 25px;
 }
 .table {
 	margin: auto;
@@ -10,9 +19,25 @@
 </style>
 <body>
 	{{> _header}}
-	<div class="body">
-		<h1 class="title">{{name}}</h1>
-		<p>{{description}}</p>
+	<div class="body_user">
+		<div class="user-data">
+			<h1 class="title">Players</h1>
+			<p>{{description}}</p>
+			<table class="table">
+				<tr>
+					<th>Name</th>
+					<th>Role</th>
+					<th>Description</th>
+				</tr>
+				{{#users}}
+					<tr>
+						<td><a href='/user/{{id}}'>{{username}}</a></td>
+						<td>{{role}}</td>
+						<td>{{description}}</td>
+					</tr>
+				{{/users}}
+			</table>
+		</div>
 	</div>
 </body>
 </html>

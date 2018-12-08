@@ -1,7 +1,8 @@
 @import "reset";
 @import "vars";
-@import "header";
+@import "login-header";
+@import "login";
+@import "user-header";
+@import "user";
+@import "teams";
 @import "body";
-body {
-	background-color: $color-primary-1;
-}

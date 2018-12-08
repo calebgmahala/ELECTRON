@@ -9,13 +9,113 @@
 }
 </style>
 <body>
-	{{> _header}}
-	<div class="body">
-		<h1 class="title">{{title}}</h1>
-		<h2>{{username}}</h2>
-		<p>{{role}}</p>
-		<h2><a href='/team/{{team_id}}'>{{team_name}}</a></h2>
-		<p>{{description}}</p>
+	{{> _user-header}}
+	<div class="body_user">
+		<div class="slider">
+			<h2 class="name">{{username}} {{#self}}<a href="/user/{{id}}/edit">Edit</a>{{/self}}</h2>
+			<p>{{role}}</p>
+			<div>
+				{{^self}}
+					{{#team_name}}
+						<a href='/team/{{team_id}}'>{{team_name}}</a>
+					{{/team_name}}</div>
+					{{^team_name}}
+						<p>None</p>
+					{{/team_name}}
+				{{/self}}
+				{{#self}}
+					{{#team_name}}
+						<a href='/team/{{team_id}}'>{{team_name}}</a>
+						<input type="button" id="leaveTeam" value="Leave" data-key="{{key}}">
+					{{/team_name}}</div>
+					{{^team_name}}
+						<a href="/teams">Join</a>
+					{{/team_name}}
+				{{/self}}
+			<p>{{description}}</p>
+		</div>
+		<div class="matches">
+			<div class='toprow'>
+				<h2>Teams</h2>
+				<h2>End Date</h2>
+			</div>
+			<div class="scroll">
+				{{#matches}}
+					<a href='/match/{{id}}'>
+						<div class="match">
+							<p>{{home_name}}: {{home_score}}</p>
+							<p>{{away_name}}: {{away_score}}</p>
+							<p class="end_date">{{end_date}}</p>
+						</div>
+					</a>
+				{{/matches}}
+			</div>
+		</div>
+		<div class="user-data">
+			<canvas id="bar-chart1" data-kd="{{#match_stats}}{{k/d}},{{/match_stats}}" data-labels="{{labels}}" data-kills="{{#match_stats}}{{kills}},{{/match_stats}}" data-deaths="{{#match_stats}}{{deaths}},{{/match_stats}}">
+				{{#match_stats}}
+					<p class="k/d">{{k/d}}</p>
+					<p>{{kills}}</p>
+					<p>{{assists}}</p>
+					<p>{{deaths}}</p>
+				{{/match_stats}}
+			</canvas>
+		</div>
 	</div>
+	<script>
+		function splitup(data, pop = true) {
+			data = data.split(',');
+			if (pop == true) {
+				data.pop()
+			}
+			data = data.slice(-10, data.length);
+			return data
+		}
+		var ctx = document.getElementById("bar-chart1");
+		
+		var labels = ctx.dataset.labels;
+		labels = splitup(labels, false)
+
+		var kd = ctx.dataset.kd;
+		kd = splitup(kd)
+
+		var kills = ctx.dataset.kills;
+		kills = splitup(kills)
+
+		var deaths = ctx.dataset.deaths;
+		deaths = splitup(deaths)
+
+		var chart = new Chart(ctx, {
+		    type: 'line',
+		    data: {
+		        labels: labels,
+		        datasets: [{
+		            label: "K/D",
+		            // backgroundColor: 'white',
+		            borderColor: 'orange',
+		            data: kd
+		        }, {
+		            label: "Kills",
+		            // backgroundColor: 'red',
+		            borderColor: 'darkblue',
+		            data: kills
+		        }, {
+		            label: "Deaths",
+		            // backgroundColor: 'red',
+		            borderColor: 'darkred',
+		            data: deaths
+		        }]
+		    },
+
+		    // Configuration options go here
+		    options: {
+		    	responsive:true,
+			    maintainAspectRatio: false
+			}
+		});
+	</script>
+	{{#files}}
+	<script type="text/javascript" src="/scripts/{{.}}"></script>
+	{{/files}}
 </body>
 </html>

@@ -24,12 +24,12 @@ class Requests(unittest.TestCase):
         conn.commit()
 
     def test_get_brackets(self):
-        result = [{"id": 3, "tournament_id": 1, "team_id": 3, "place": 1, "games_won": 2, "games_tied": 0, "games_lost": 0, "score": None, "games_played": 2}, {"id": 2, "tournament_id": 1, "team_id": 2, "place": 2, "games_won": 1, "games_tied": 0, "games_lost": 1, "score": None, "games_played": 2}, {"id": 1, "tournament_id": 1, "team_id": 1, "place": 3, "games_won": 1, "games_tied": 0, "games_lost": 1, "score": None, "games_played": 2}, {"id": 4, "tournament_id": 1, "team_id": 4, "place": 4, "games_won": 0, "games_tied": 0, "games_lost": 2, "score": None, "games_played": 2}]
+        result = [{"id": 3, "tournament_id": 1, "team_id": 3, "user_id": None, "place": 1, "games_won": 2, "games_tied": 0, "games_lost": 0, "score": None, "games_played": 2}, {"id": 2, "tournament_id": 1, "team_id": 2, "user_id": None, "place": 2, "games_won": 1, "games_tied": 0, "games_lost": 1, "score": None, "games_played": 2}, {"id": 1, "tournament_id": 1, "team_id": 1, "user_id": None, "place": 3, "games_won": 1, "games_tied": 0, "games_lost": 1, "score": None, "games_played": 2}, {"id": 4, "tournament_id": 1, "team_id": 4, "user_id": None, "place": 4, "games_won": 0, "games_tied": 0, "games_lost": 2, "score": None, "games_played": 2}]
         r = requests.get(url + 'tournaments/1/brackets')
         self.assertEqual(result, r.json())
 
     def test_get_bracket(self):
-        result = {"id": 3, "tournament_id": 1, "team_id": 3, "place": 1, "games_won": 2, "games_tied": 0, "games_lost": 0, "games_played": 2, "score": None}
+        result = {"id": 3, "tournament_id": 1, "team_id": 3, "user_id": None, "place": 1, "games_won": 2, "games_tied": 0, "games_lost": 0, "games_played": 2, "score": None}
         r = requests.get(url + 'tournaments/1/brackets/3')
         self.assertEqual(result, r.json())
 
@@ -38,7 +38,7 @@ class Requests(unittest.TestCase):
         self.assertEqual(200, r.status_code)
 
     def test_edit_bracket(self):
-        result = [{'id': 3, 'tournament_id': 1, 'team_id': 3, 'place': 1, 'games_won': 2, 'games_tied': 0, 'games_lost': 0, 'score': None, 'games_played': 2}, {'id': 1, 'tournament_id': 1, 'team_id': 1, 'place': 2, 'games_won': 2, 'games_tied': 0, 'games_lost': 1, 'score': None, 'games_played': 3}, {'id': 2, 'tournament_id': 1, 'team_id': 2, 'place': 2, 'games_won': 1, 'games_tied': 0, 'games_lost': 1, 'score': None, 'games_played': 2}, {'id': 4, 'tournament_id': 1, 'team_id': 4, 'place': 4, 'games_won': 0, 'games_tied': 0, 'games_lost': 2, 'score': None, 'games_played': 2}]
+        result = [{'id': 3, 'tournament_id': 1, 'team_id': 3, "user_id": None, 'place': 1, 'games_won': 2, 'games_tied': 0, 'games_lost': 0, 'score': None, 'games_played': 2}, {'id': 1, 'tournament_id': 1, 'team_id': 1, "user_id": None, 'place': 2, 'games_won': 2, 'games_tied': 0, 'games_lost': 1, 'score': None, 'games_played': 3}, {'id': 2, 'tournament_id': 1, 'team_id': 2, "user_id": None, 'place': 2, 'games_won': 1, 'games_tied': 0, 'games_lost': 1, 'score': None, 'games_played': 2}, {'id': 4, 'tournament_id': 1, 'team_id': 4, "user_id": None, 'place': 4, 'games_won': 0, 'games_tied': 0, 'games_lost': 2, 'score': None, 'games_played': 2}]
         r = requests.put(url + 'tournaments/1/brackets/1', data={"place": 2, "games_won": 2, "games_tied": 0, "games_lost": 1, "games_played": 3}, headers={'organizer_key':'root'})
         r2 = requests.get(url + 'tournaments/1/brackets')
         self.assertEqual(200, r.status_code)

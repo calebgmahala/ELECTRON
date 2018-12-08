@@ -24,7 +24,9 @@ class FailRequests(unittest.TestCase):
         conn.commit()
 
     def test_fail_get_tournament(self):
-        cur.execute('DELETE FROM brackets WHERE 1=1')
+        cur.execute('DELETE FROM `match_leaderboards` WHERE 1=1')
+        cur.execute('DELETE FROM `matches` WHERE 1=1')
+        cur.execute('DELETE FROM `brackets` WHERE 1=1')
         cur.execute('DELETE FROM `tournaments` WHERE 1=1;')
         conn.commit()
         r = requests.get(url + 'tournaments/1')
@@ -39,7 +41,9 @@ class FailRequests(unittest.TestCase):
         self.assertEqual(409, r.status_code)
 
     def test_fail_edit_tournament(self):
-        cur.execute('DELETE FROM brackets WHERE 1=1')
+        cur.execute('DELETE FROM `match_leaderboards` WHERE 1=1')
+        cur.execute('DELETE FROM `matches` WHERE 1=1')
+        cur.execute('DELETE FROM `brackets` WHERE 1=1')
         cur.execute('DELETE FROM `tournaments` WHERE 1=1;')
         conn.commit()
         r = requests.put(url + 'tournaments/1', data={"name": 1, "description": "Test"}, headers={'request_key':'root'})
@@ -50,7 +54,9 @@ class FailRequests(unittest.TestCase):
         self.assertEqual(409, r.status_code)
 
     def test_fail_delete_tournament(self):
-        cur.execute('DELETE FROM brackets WHERE 1=1')
+        cur.execute('DELETE FROM `match_leaderboards` WHERE 1=1')
+        cur.execute('DELETE FROM `matches` WHERE 1=1')
+        cur.execute('DELETE FROM `brackets` WHERE 1=1')
         cur.execute('DELETE FROM `tournaments` WHERE 1=1;')
         conn.commit()
         r = requests.delete(url + 'tournaments/1', headers={'request_key':'root'})

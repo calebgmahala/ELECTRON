@@ -24,7 +24,9 @@ class Requests(unittest.TestCase):
         conn.commit()
 
     def test_fail_get_user(self):
-        cur.execute('DELETE FROM brackets WHERE 1=1')
+        cur.execute('DELETE FROM `match_leaderboards` WHERE 1=1')
+        cur.execute('DELETE FROM `matches` WHERE 1=1')
+        cur.execute('DELETE FROM `brackets` WHERE 1=1')
         cur.execute('DELETE FROM `tournaments` WHERE 1=1;')
         cur.execute('DELETE FROM `organizers_teams` WHERE 1=1;')
         cur.execute('DELETE FROM `organizers` WHERE 1=1;')
@@ -38,7 +40,9 @@ class Requests(unittest.TestCase):
         self.assertEqual(404, r.status_code)
 
     def test_fail_put_user(self):
-        cur.execute('DELETE FROM brackets WHERE 1=1')
+        cur.execute('DELETE FROM `match_leaderboards` WHERE 1=1')
+        cur.execute('DELETE FROM `matches` WHERE 1=1')
+        cur.execute('DELETE FROM `brackets` WHERE 1=1')
         cur.execute('DELETE FROM `tournaments` WHERE 1=1;')
         cur.execute('DELETE FROM `organizers_teams` WHERE 1=1;')
         cur.execute('DELETE FROM `organizers` WHERE 1=1;')
@@ -68,7 +72,9 @@ class Requests(unittest.TestCase):
         self.assertEqual(409, r.status_code)
 
     def test_fail_delete_user(self):
-        cur.execute('DELETE FROM brackets WHERE 1=1')
+        cur.execute('DELETE FROM `match_leaderboards` WHERE 1=1')
+        cur.execute('DELETE FROM `matches` WHERE 1=1')
+        cur.execute('DELETE FROM `brackets` WHERE 1=1')
         cur.execute('DELETE FROM `tournaments` WHERE 1=1;')
         cur.execute('DELETE FROM `organizers_teams` WHERE 1=1;')
         cur.execute('DELETE FROM `organizers` WHERE 1=1;')

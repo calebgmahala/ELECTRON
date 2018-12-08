@@ -1,0 +1,91 @@
+body {
+	background-color: darkgrey;
+}
+.body_user {
+	background-color: darkgrey;
+	padding-top: 30px;
+	padding-right: 2%;
+	padding-left: 2%;
+	position: absolute;
+	width: 96%;
+	height: auto;
+}
+.slider {
+	box-shadow: 2px 3px 5px black;
+	border: 1px solid black;
+	border-radius: 10px;
+	background-color: lightblue;
+	position: sticky;
+	display: inline-block;
+	width: 30%;
+	height: 300px;
+	top: 30px;
+	float: right;
+	div, p, a{
+		font-family: 'Alegreya Sans SC', sans-serif;
+		font-size: 18px;
+		margin-top: 5px;
+		margin-left: 5px;
+	}	
+	.name {
+		font-family: 'Alegreya Sans SC', sans-serif;
+		font-size: 30px;
+		text-align: center;
+		margin-top: 10px;
+		border-bottom: 1px solid black;
+	}
+}
+.matches {
+	box-shadow: 2px 3px 5px black;
+	border: 1px solid black;
+	border-radius: 10px;
+	background-color: lightblue;
+	display: block;
+	width: 65%;
+	height: 500px;
+	.toprow {
+		font-family: 'Alegreya Sans SC', sans-serif;
+		font-size: 30px;
+		display: flex;
+		justify-content: space-around;
+		align-items: center;
+		height: 20%;
+		border-bottom: 5px solid black;
+
+	}
+	.scroll {
+		height: 78%;
+		width: 100%;
+		overflow-y: scroll;
+	}
+	.match {
+		display: flex;
+		justify-content: space-around;
+		align-items: center;
+		height: 50px;
+		border-bottom: 3px;
+		border-style: solid;
+		border-color: black;
+		p {
+			display: inline-block;
+			text-decoration: none;
+			color: black;
+		}
+	}
+}
+.user-data {
+	box-shadow: 2px 3px 5px black;
+	border: 1px solid black;
+	border-radius: 10px;
+	background-color: lightblue;
+	display: block;
+	width: 65%;
+	height: 500px;
+	margin-top: 30px;
+	margin-bottom: 10px;
+	padding: 5px;
+	svg {
+		height: 100%;
+		width: 100%;
+	}
+}

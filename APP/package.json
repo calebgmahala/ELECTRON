@@ -4,6 +4,7 @@
   "main": "main.js",
   "dependencies": {
     "body-parser": "^1.18.3",
+    "chart.js": "^2.7.3",
     "express": "^4.16.4",
     "express-session": "^1.15.6",
     "mustache": "^3.0.0",
