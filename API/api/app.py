@@ -1,4 +1,4 @@
-from flask import Flask, make_response, request, redirect, Response
+from flask import Flask, make_response, request, redirect, Response, render_template
 # using flask as api framework
 import mysql.connector
 #used to pull mysql database
@@ -141,6 +141,11 @@ match_leaderboard_keys = [
 	'deaths',
 	'dpr']
 
+# index static page. made from swagger file. home route
+@app.route("/", methods=['GET'])
+def index():
+	return render_template('index.html')
+
 #users routes
 @app.route("/users", methods=['GET', 'POST'])
 def Users():
@@ -189,11 +194,9 @@ def User(id):
 		if user is None:
 			return Response(status=404)
 		elif check_auth('users', 'request_key', 'id', id) and check_auth('teams', 'team_key', 'id', request.headers.get('team_id')):
-			if (user[6] == 0):
-				print('test')
+			if (user[6] == 0): #user[6] is 
 				cur.execute('UPDATE users SET team_id=' + request.headers.get('team_id') + ' WHERE id=' + str(body['id']))
 				conn.commit()
-				print('after')
 				return Response(status=200)
 			else:
 				return Response(status=403)
@@ -614,6 +617,7 @@ def TeamUsers(id):
 				show_results(user_keys, obj, usr, a, ['password','request_key','team_id'])
 				resp.append(obj)
 			return json.dumps(resp)
+
 # tournament routes
 @app.route("/tournaments", methods=['GET', 'POST'])
 def Tournaments():
@@ -690,6 +694,7 @@ def Tournament(id):
 		else:
 			return Response(status=409)
 
+# bracket routes
 @app.route("/tournaments/<int:id>/brackets", methods=['GET', 'POST'])
 def Brackets(id):
 	conn.commit() # allows reload for testing otherwise database is not refreshed
@@ -767,6 +772,7 @@ def Bracket(t_id, brak_id):
 		else:	
 			return Response(status=409)
 
+# match routes
 @app.route("/tournaments/<int:id>/matches", methods=['GET', 'POST'])
 def Matches(id):
 	conn.commit() # allows reload for testing otherwise database is not refreshed
@@ -835,6 +841,7 @@ def Match(id):
 		else:
 			return Response(status=409)
 
+# match leaderboards routes
 @app.route("/matches/<int:id>/leaderboard", methods=['GET', 'POST'])
 def Match_leaderboard(id):
 	conn.commit() # allows reload for testing otherwise database is not refreshed
