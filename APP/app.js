@@ -20,6 +20,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(session({secret: "I play pokemon go everyday", resave: false, saveUninitialized: true}));
 
+//templateVar is used to build out variables passed to templates
 templateVar = {}
 
 //  api request function
@@ -38,6 +39,7 @@ function CallApi(a, b='GET') {
 	})
 }
 
+// this function resets templateVar back to the bare bone variables. (session)
 function resetTempVar() {
 	var resp = {}
 	resp['user'] = templateVar["user"]
@@ -49,6 +51,7 @@ function resetTempVar() {
 	return resp
 }
 
+// change number roles to words
 function roles(user) {
 	if (user['role'] == 1) {
 		return 'rifler'
@@ -59,6 +62,7 @@ function roles(user) {
 	}
 }
 
+// change league types to words
 function types(tourn) {
 	if (tourn['type'] == 1) {
 		return 'league'
@@ -98,6 +102,7 @@ app.post('/login', function(req, res) {
 	    		req.session.user_id = body['id']
 	    		req.session.key = body['request_key']
 	    		req.session.perms = body['permission']
+	    		//sets templatevar for later use anyware in the file
 	    		templateVar["user"] = body['username']
 	    		templateVar["id"] = body['id']
 	    		templateVar["key"] = body['request_key']
@@ -136,6 +141,7 @@ app.get('/signup', function(req, res) {
 	res.render('login.html', templateVar)
 })
 
+// get all users
 app.get('/users', function(req, res) {
 	// make an api call and on response render the html page.
 	CallApi('users').then(function(users) {
@@ -159,15 +165,22 @@ app.get('/users', function(req, res) {
 	})
 })
 
+// get one user
 app.get('/user/:id', async function(req, res) {
 	var promiseArray = []
 	var resp = {}
+	// response varables set here so they can 
+	// be appended to in the promise nesting
+	// and called later on in the endpoint
+
+	// promises are nested due to api endpoints 
+	// not giveing relative data
 	resp['user'] = []
 	resp['team'] = []
 	resp['leagues'] = []
 	// make an api call and on response render the html page.
 	var prom0 = CallApi('users/'+req.params['id'])
-	promiseArray.push(prom0)
+	promiseArray.push(prom0) // promise is added to array that will be used at end of endpoint
 	await prom0.then(async function(user) {
 		user = JSON.parse(user)
 		resp['user'] = user
@@ -232,6 +245,7 @@ app.get('/user/:id', async function(req, res) {
 	})
 	await Promise.all(promiseArray).then(async function(value) {
 		templateVar = resetTempVar()
+		//checks for self
 		if (resp['user']['id'] == templateVar['id']) {
 			templateVar['self'] = true;
 		}
@@ -259,6 +273,7 @@ app.get('/user/:id', async function(req, res) {
 				})
 			})
 		}
+		//builds out stats
 		templateVar['match_stats'] = resp['user']['match_stats']
 		for (i in templateVar['match_stats']) {
 			if (templateVar['match_stats'][i]['deaths'] != 0) {
@@ -271,6 +286,7 @@ app.get('/user/:id', async function(req, res) {
 	})
 })
 
+// edit user
 app.get('/user/:id/edit', async function(req, res) {
 	CallApi('users/'+req.params['id']).then(function(user) {
 		user = JSON.parse(user)
@@ -403,7 +419,7 @@ app.get('/teams/new', function(req, res) {
 	res.render('teamForm.html', {"user": req.session.user, "key": req.session.key, "id": req.session.user_id, "file": "newTeam.js"})
 })
 
-// edit league
+// edit team
 app.get('/team/:id/edit', function(req, res) {
 	templateVar = resetTempVar()
 	templateVar['files'] = ['editTeam.js']
@@ -413,6 +429,7 @@ app.get('/team/:id/edit', function(req, res) {
 	res.render('teamForm.html', templateVar)
 })
 
+// join team
 app.get('/team/:id/join', async function(req, res) {
 	templateVar = resetTempVar()
 	templateVar["files"] = ['joinTeam.js']
@@ -420,6 +437,7 @@ app.get('/team/:id/join', async function(req, res) {
 	res.render('joinTeam.html', templateVar)
 })
 
+// get all tournaments
 app.get('/tournaments', function(req, res) {
 	// make an api call and on response render the html page.
 	CallApi('tournaments').then(function(value) {
@@ -432,6 +450,7 @@ app.get('/tournaments', function(req, res) {
 		res.render('tournaments.html', templateVar)	})
 })
 
+// get one tournament
 app.get('/tournament/:id', async function(req, res) {
 	var promiseArray = []
 	var resp = {}
@@ -508,6 +527,7 @@ app.get('/tournament/:id', async function(req, res) {
 	})
 })
 
+// get one match
 app.get('/matches/:id', async function(req, res) {
 	var promiseArray = []
 	var resp = {}
@@ -569,6 +589,7 @@ app.get('/matches/:id', async function(req, res) {
 	})
 })
 
+// new match
 app.get('/tournament/:id/matches/new', function(req, res) {
 	CallApi('tournaments/'+req.params['id']).then(function(tourn) {
 		tourn = JSON.parse(tourn)
@@ -585,6 +606,7 @@ app.get('/tournament/:id/matches/new', function(req, res) {
 	})
 })
 
+// edit match
 app.get('/tournament/:t_id/matches/:id/edit', function(req, res) {
 	CallApi('tournaments/'+req.params['t_id']).then(function(tourn) {
 		tourn = JSON.parse(tourn)
@@ -598,12 +620,6 @@ app.get('/tournament/:t_id/matches/:id/edit', function(req, res) {
 			res.render('matchForm.html', templateVar)
 		})
 	})
-})
-
-app.get('/match_leaderboard/new', function(req, res) {
-})
-
-app.get('/match_leaderboard/:id/edit', function(req, res) {
 })
 
 app.listen(port)
