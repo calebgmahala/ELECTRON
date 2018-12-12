@@ -21,7 +21,7 @@ env = 'test'
 def connect_db():
 	return mysql.connector.connect(user='root', database=env, host='localhost')
 
-#show results function
+#show results function (used for get requests)
 def show_results(keys, obj, resp, respit=None, notkeys=[]):
 	for b in range(len(keys)):
 		if respit is None :
@@ -31,7 +31,7 @@ def show_results(keys, obj, resp, respit=None, notkeys=[]):
 			if keys[b] not in notkeys:
 				obj[keys[b]] = resp[respit][b]
 
-# put post function
+# put post function (used for put and post requests to build queries)
 def put_post(var, notkeys, inserts, putpost):
 	if putpost == 'POST':
 		keys = '('
