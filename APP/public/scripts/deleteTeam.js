@@ -1,14 +1,16 @@
-function removeTeam() {
-  id = window.location.pathname.split('/')[2]
-  $.ajax({
-    type: "DELETE",
-    url: "http://localhost:5000/teams/" + id,
-    headers: {"request_key": $(this).data('key') },
-    success: function() {
-      window.location.replace("/teams");
-    },
-    error: function() {
-      window.location.replace("/teams");
-    }
-  });
-}
+$(document).ready(function() {
+  $(".deleteTeam").click(function(event) {
+    event.preventDefault();
+    $.ajax({
+      type: "DELETE",
+      url: "http://localhost:5000/teams/" + $(this).data('id'),
+      headers: {"request_key": $(this).data('key') },
+      success: function() {
+        window.location.replace('/teams');
+      },
+      error: function() {
+        alert('error');
+      }
+    });
+  })
+})

@@ -42,7 +42,7 @@
 					</tr>
 				{{/brack}}
 			</table>
-			<h1 class="title">Matches</h1>
+			<h1 class="title">Matches {{#owner}}<a href="/tournament/{{tid}}/matches/new">New</a>{{/owner}}</h1>
 			<table class="table">
 				<tr>
 					<th>Home</th>
@@ -51,6 +51,9 @@
 					<th>Score</th>
 					<th>Start</th>
 					<th>End</th>
+					{{#owner}}
+						<th>Actions</th>
+					{{/owner}}
 				</tr>
 				{{#matches}}
 					<tr>
@@ -60,10 +63,19 @@
 						<td>{{away_score}}</td>
 						<td>{{start_date}}</td>
 						<td>{{end_date}}</td>
+						{{#owner}}
+							<td>
+								<a href="/tournament/{{tid}}/matches/{{id}}/edit">Edit</a>
+								<input class="deleteMatch" type="button" value="Delete" data-key="{{key}}" data-id="{{id}}">
+							</td>
+						{{/owner}}
 					</tr>
 				{{/matches}}
 			</table>
 		</div>
 	</div>
+	{{#files}}
+  <script type="text/javascript" src="/scripts/{{.}}"></script>
+  {{/files}}
 </body>
 </html>

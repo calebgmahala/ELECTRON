@@ -12,7 +12,7 @@
 	{{> _user-header}}
 	<div class="body_user">
 		<div class="slider">
-			<h2 class="name">{{username}} {{#self}}<a href="/user/{{id}}/edit">Edit</a>{{/self}}</h2>
+			<h2 class="name">{{username}} {{#self}}<a href="/user/{{id}}/edit">Edit</a><input class="deleteUser" type="button" value="Delete" data-key="{{key}}" data-id="{{id}}">{{/self}}</h2>
 			<p>{{role}}</p>
 			<div>
 				{{^self}}
@@ -41,7 +41,7 @@
 			</div>
 			<div class="scroll">
 				{{#matches}}
-					<a href='/match/{{id}}'>
+					<a href='/matches/{{id}}'>
 						<div class="match">
 							<p>{{home_name}}: {{home_score}}</p>
 							<p>{{away_name}}: {{away_score}}</p>

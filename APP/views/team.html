@@ -21,7 +21,7 @@
 	{{> _header}}
 	<div class="body_user">
 		<div class="slider">
-			<h2 class="name">leagues<a href="/team/{{tid}}/join">Join</a></h2>
+			<h2 class="name">leagues {{^owner}}<a href="/team/{{tid}}/join">Join</a>{{/owner}}</h2>
 			<div>
 				{{#leagues}}
 					<a href='/league/{{id}}'>{{name}}</a>
@@ -29,7 +29,7 @@
 			</div>
 		</div>
 		<div class="data">
-			<h1 class="title">{{description}} {{#owner}}<a href="/team/{{tid}}/edit">Edit</a>{{/owner}}</h1>
+			<h1 class="title">{{description}} {{#owner}}<a href="/team/{{tid}}/edit">Edit</a><input class="deleteTeam" type="button" value="Delete" data-key="{{key}}" data-id="{{id}}">{{/owner}}</h1>
 			<h1 class="title">Players</h1>
 			<table class="table">
 				<tr>

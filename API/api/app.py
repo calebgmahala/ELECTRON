@@ -203,7 +203,7 @@ def User(id):
 		elif len(request.form) is 0:
 			return Response(status=409)
 		elif check_auth('users', 'request_key', 'permission', 2):
-			if 'team_id' not in body :
+			if 'team_id' not in body:
 				cur.execute('UPDATE users SET ' + put_post(user_keys, ['id'], body, 'PUT') + ' WHERE id=' + str(body['id']))
 				conn.commit()
 				return Response(status=200)
@@ -213,12 +213,12 @@ def User(id):
 				return Response(status=200)	
 				
 		elif check_auth('users', 'request_key', 'id', id):
-			if body['team_id'] == 'none':
-				cur.execute('UPDATE users SET team_id=Null WHERE id ='+str(id))
+			if 'team_id' not in body:
+				cur.execute('UPDATE users SET ' + put_post(user_keys, ['id', 'request_key', 'permission', 'is_owner_team'], body, 'PUT') + ' WHERE id=' + str(body['id']))
 				conn.commit()
 				return Response(status=200)
-			else:
-				cur.execute('UPDATE users SET ' + put_post(user_keys, ['id', 'request_key', 'permission', 'is_owner_team'], body, 'PUT') + ' WHERE id=' + str(body['id']))
+			elif body['team_id'] == 'none':
+				cur.execute('UPDATE users SET team_id=Null WHERE id ='+str(id))
 				conn.commit()
 				return Response(status=200)
 		else:
@@ -308,7 +308,6 @@ def Leagues():
 		if check_auth('users', 'request_key', 'permission', 1) or check_auth('users', 'request_key', 'permission', 2):
 			try: 
 				body['organizer_key'] = bcrypt.hashpw( body['organizer_key'].encode("utf-8"), bcrypt.gensalt()).decode('utf-8')
-				body['entry_fee'] = int(body['entry_fee'])
 				cur.execute('INSERT INTO organizers ' + put_post(league_keys, ['id'], body, 'POST'))
 				conn.commit()
 				return Response(status=200)
@@ -345,7 +344,6 @@ def League(id):
 				body['organizer_key'] = bcrypt.hashpw( body['organizer_key'].encode("utf-8"), bcrypt.gensalt()).decode('utf-8')
 			except:
 				pass
-			body['entry_fee'] = int(body['entry_fee'])
 			cur.execute('UPDATE organizers SET ' + put_post(league_keys, ['id'], body, 'PUT') + ' WHERE id=' + str(body['id']))
 			conn.commit()
 			return Response(status=200)
@@ -643,7 +641,6 @@ def Tournaments():
 			return Response(status=404)
 		elif check_auth('users', 'request_key', 'id', '(SELECT owner_id FROM organizers WHERE id =' + body['organizer_id'] + ')') or check_auth('organizers', 'organizer_key', 'id', body['organizer_id']):
 			try: 
-				body['entry_fee'] = int(body['entry_fee'])
 				cur.execute('INSERT INTO tournaments ' + put_post(tournament_keys, ['id', 'end_date'], body, 'POST'))
 				conn.commit()
 				return Response(status=200)
@@ -676,7 +673,6 @@ def Tournament(id):
 		if cur.fetchone() is None:
 			return Response(status=404)
 		elif check_auth('organizers', 'organizer_key', 'id', str(id)) or check_auth('users', 'request_key', 'id', '(SELECT owner_id FROM organizers WHERE id =(SELECT organizer_id FROM tournaments WHERE id=' + str(id) +')) OR permission=2'):
-			body['entry_fee'] = int(body['entry_fee'])
 			cur.execute("UPDATE tournaments SET " + put_post(tournament_keys, ['id'], body, 'PUT') + " WHERE id=" + str(body['id']))
 			conn.commit()
 			return Response(status=200)

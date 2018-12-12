@@ -2,6 +2,9 @@
 <style>
 .title {
 	text-align: center;
+	font-family: 'Alegreya Sans SC', sans-serif;
+	font-size: 23px;
+	margin-top: 20px;
 }
 .cardHolder {
 	display: flex;
@@ -22,14 +25,61 @@ h2 {
 	{{> _header}}
 	<div class="body_user">
 		<div class="slider">
-			<h1 class="title">{{name}}</h1>
+			<h1 class="name">{{name}} {{#self}}<a href="/league/{{id}}/edit">Edit</a><input class="deleteLeague" type="button" value="Delete" data-key="{{key}}" data-id="{{id}}">{{/self}} {{#owner_team_id}}<input id="joinLeague" type="button" value="Join League" data-key="{{key}}" data-team_id="{{owner_team_id}}">{{/owner_team_id}}</h1>
 			<p>Owner: {{owner}}</p>
 			<p>{{description}}</p>
 			<p class="money">${{entry_fee}}</p>
-			<input id="deleteLeague" type="button" value="Delete" data-key="{{key}}">
+			<h1 class="name">tournaments</h1>
+			{{#tournaments}}
+				<p><a href="/tournament/{{id}}">{{name}}</a>
+			{{/tournaments}}
 		</div>
-		<div class="m">
-			
+		<div class="matches">
+			<h1 class="title">Teams</h1>
+			<table class="table">
+				<tr>
+					<th>Name</th>
+					<th>Description</th>
+					{{#self}}
+					<th>Actions</th>
+					{{/self}}
+				</tr>
+				{{#teams}}
+					<tr>
+						<td><a href="/team/{{id}}">{{name}}</a></td>
+						<td>{{description}}</td>
+						{{#self}}
+							<td>
+								<input class="removeLeagueTeam" type="button" value="Kick" data-key="{{key}}" data-id="{{id}}">
+							</td>
+						{{/self}}
+					</tr>
+				{{/teams}}
+			</table>
+			{{#self}}
+				<table class="table">
+					<tr>
+						<th>Name</th>
+						<th>Description</th>
+						{{#self}}
+						<th>Actions</th>
+						{{/self}}
+					</tr>
+					{{#teams_requests}}
+						<tr>
+							<td><a href="/team/{{id}}">{{name}}</a></td>
+							<td>{{description}}</td>
+							{{#self}}
+								<td>
+									<input class="removeLeagueTeam" type="button" value="Kick" data-key="{{key}}" data-id="{{id}}">
+									<input class="editLeagueTeam" type="button" value="Accept" data-key="{{key}}" data-id="{{id}}">
+								</td>
+							{{/self}}
+						</tr>
+					{{/teams_requests}}
+				</table>
+			{{/self}}
+		</div>		
 		</div>
 	</div>
 	{{#files}}

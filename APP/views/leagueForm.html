@@ -18,10 +18,18 @@
         <input name="organizer_key" type="text" id="organizer_key">
       </div>
       <input name="owner_id" type="hidden" value="{{id}}">
+      {{#admin}}
+        <div class="form-group">
+          <label for="owner_id">Owner ID</label>
+          <input name="owner_id" type="text" id="owner_id">
+        </div>
+      {{/admin}}
       <textarea rows="4" cols="50" id="description" name="description" form="leagueForm">Description</textarea>
       <button type="submit">Submit</button>
     </form>
   </div>
-  <script type="text/javascript" src="/scripts/{{file}}"></script>
+  {{#files}}
+  <script type="text/javascript" src="/scripts/{{.}}"></script>
+  {{/files}}
 </body>
 </html

@@ -26,6 +26,9 @@
 					<th>Is Owner of Team?</th>
 					<th>Description</th>
 					<th>role</th>
+					{{#admin}}
+					<th>actions</th>
+					{{/admin}}
 				</tr>
 				{{#users}}
 					<tr>
@@ -35,10 +38,19 @@
 						<td>{{is_owner_team}}</td>
 						<td>{{description}}</td>
 						<td>{{role}}</td>
+						{{#admin}}
+							<td>
+								<a href="user/{{id}}/edit">Edit</a>
+								<input class="deleteUser" type="button" value="Delete" data-key="{{key}}" data-id="{{id}}">
+							</td>
+						{{/admin}}
 					</tr>
 				{{/users}}
 			</table>
 		</div>
 	</div>
+	{{#files}}
+	<script type="text/javascript" src="/scripts/{{.}}"></script>
+	{{/files}}
 </body>
 </html>

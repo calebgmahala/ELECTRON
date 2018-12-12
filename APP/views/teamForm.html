@@ -9,11 +9,19 @@
         <label for="name">Name</label>
         <input name="name" type="text" id="name" placeholder="Enter name">
       </div>
+      {{#self}}
+        <div class="form-group">
+          <label for="team_key">Team key</label>
+          <input name="team_key" type="text" id="team_key">
+        </div>
+      {{/self}}
       <input name="owner_id" type="hidden" value="{{id}}">
       <textarea rows="4" cols="50" id="description" name="description" form="teamForm">Description</textarea>
       <button type="submit">Submit</button>
     </form>
   </div>
-  <script type="text/javascript" src="/scripts/{{file}}"></script>
+  {{#files}}
+  <script type="text/javascript" src="/scripts/{{.}}"></script>
+  {{/files}}
 </body>
 </html>

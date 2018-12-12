@@ -4,14 +4,14 @@
 <body>
   {{> _header}}
   <div class="body_user">
-    <form id='teamForm'  data-key='{{key}}'>
+    <form id='userForm'  data-key='{{key}}'>
       <div class="form-group">
         <label for="username">Username</label>
         <input name="username" type="text" id="username" placeholder="Enter username">
       </div>
       <div class="form-group">
         <label for="password">Password</label>
-        <input name="password" type="text" id="password">
+        <input name="password" type="password" id="password">
       </div>
       <div class="form-group">
         <label for="role">Role</label>
@@ -20,14 +20,39 @@
           <option value="2">Awper</option>
         </select>
       </div>
+      {{#admin}}
+        <div class="form-group">
+          <label for="request_key">Request_key</label>
+          <input name="request_key" type="text" id="request_key">
+        </div>
+        <div class="form-group">
+          <label for="permission">Permission</label>
+          <select name="permission">
+            <option value="0">Member</option>
+            <option value="1">Organizer</option>
+            <option value="2">Admin</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="team_id">Team ID</label>
+          <input name="team_id" type="number" id="team_id">
+        </div>
+        <div class="form-group">
+          <label for="is_owner_team">Owner of Team?</label>
+          <select name="is_owner_team">
+            <option value="0">Member</option>
+            <option value="1">Owner</option>
+          </select>
+        </div>
+      {{/admin}}
       <div class="form-group">
         <textarea rows="4" cols="50" id="description" name="description" form="teamForm">{{description}}</textarea>
       </div>
       <button type="submit">Submit</button>
     </form>
   </div>
-  {{#script}}
-  <script type="text/javascript" src="/scripts/{{file}}"></script>
-  {{/script}}
+  {{#files}}
+  <script type="text/javascript" src="/scripts/{{.}}"></script>
+  {{/files}}
 </body>
 </html>

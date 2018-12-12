@@ -17,22 +17,34 @@
 	{{> _header}}
 	<div class="body_user">
 		<div class="data">
-			<h1 class="title">{{title}}</h1>
+			<h1 class="title">{{title}} {{#new}}<a href="/leagues/new">New</a>{{/new}}</h1>
 			<table class="table">
 				<tr>
 					<th>Name</th>
 					<th>entry_fee</th>
 					<th>Description</th>
+					{{#admin}}
+					<th>actions</th>
+					{{/admin}}
 				</tr>
 				{{#leagues}}
 					<tr>
 						<td><a href='/league/{{id}}'>{{name}}</a></td>
 						<td>${{entry_fee}}</td>
 						<td>{{description}}</td>
+						{{#admin}}
+							<td>
+								<a href="league/{{id}}/edit">Edit</a>
+								<input class="deleteLeague" type="button" value="Delete" data-key="{{key}}" data-id="{{id}}">
+							</td>
+						{{/admin}}
 					</tr>
 				{{/leagues}}
 			</table>
 		</div>
 	</div>
+	{{#files}}
+	<script type="text/javascript" src="/scripts/{{.}}"></script>
+	{{/files}}
 </body>
 </html>

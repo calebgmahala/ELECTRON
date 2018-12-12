@@ -1,12 +1,12 @@
 $(document).ready(function() {
-  $(".deleteLeague").click(function(event) {
+  $(".deleteMatch").click(function(event) {
   event.preventDefault();
   $.ajax({
     type: "DELETE",
-    url: "http://localhost:5000/leagues/" + $(this).data('id'),
+    url: "http://localhost:5000/matches/" + $(this).data('id'),
     headers: {"request_key": $(this).data('key') },
     success: function() {
-      window.location.replace("/leagues");
+      window.location.reload();
     },
     error: function() {
       alert('error');

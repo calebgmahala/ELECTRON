@@ -72,7 +72,7 @@ function types(tourn) {
 // login and users
 app.get('/login', function(req, res) {
 	templateVar = resetTempVar()
-	templateVar["user"] = req.session.user 
+	templateVar["user"] = req.session.user
 	templateVar["id"] = req.session.user_id
 	templateVar["key"] = req.session.key
 	templateVar['file'] = 'login.js'
@@ -122,7 +122,7 @@ app.get('/logout', function(req, res) {
 		if (!error && response.statusCode == 200) {
     		req.session.destroy()
     		templateVar = {}
-			res.sendStatus(200) 
+			res.sendStatus(200)
   		} else {
   			res.sendStatus(404)
   		}
@@ -143,6 +143,10 @@ app.get('/users', function(req, res) {
 		templateVar = resetTempVar()
 		templateVar['title'] = 'Users'
 		templateVar['users'] = users
+		templateVar['files'] = ['logout.js', 'deleteUser.js']
+		if (templateVar['perms'] == 2) {
+			templateVar['admin'] = 1
+		}
 		for (var a in users) {
 			templateVar['users'][a]['role'] = roles(users[a])
 			// CallApi('teams/'+users[a]['team_id']).then(function(team) {
@@ -219,7 +223,7 @@ app.get('/user/:id', async function(req, res) {
 								}
 							})
 						}
-					}						
+					}
 				})
 			})
 		} else {
@@ -234,7 +238,7 @@ app.get('/user/:id', async function(req, res) {
 		if (templateVar['perms'] == 2) {
 			templateVar['admin'] = true;
 		}
-		templateVar["files"] = ['logout.js', 'leaveTeam.js']
+		templateVar["files"] = ['logout.js', 'leaveTeam.js', 'deleteUser.js']
 		templateVar['labels'] = []
 		templateVar['title'] = 'Profile'
 		templateVar['user_id'] = resp['user']['id']
@@ -254,7 +258,7 @@ app.get('/user/:id', async function(req, res) {
 					templateVar['matches'][i]['home_name'] = home['name']
 				})
 			})
-		}	
+		}
 		templateVar['match_stats'] = resp['user']['match_stats']
 		for (i in templateVar['match_stats']) {
 			if (templateVar['match_stats'][i]['deaths'] != 0) {
@@ -270,9 +274,13 @@ app.get('/user/:id', async function(req, res) {
 app.get('/user/:id/edit', async function(req, res) {
 	CallApi('users/'+req.params['id']).then(function(user) {
 		user = JSON.parse(user)
-		templateVar['file'] = ['editUser.js']
+		templateVar = resetTempVar()
+		templateVar['files'] = ['editUser.js']
 		templateVar['title'] = 'Edit Profile'
 		templateVar['description'] = user['description']
+		if (templateVar['perms'] == 2) {
+			templateVar['admin'] = 1
+		}
 		res.render('userForm.html', templateVar)
 	})
 })
@@ -284,7 +292,14 @@ app.get('/leagues', function(req, res) {
 		templateVar = resetTempVar()
 		templateVar['title'] = 'Leagues'
 		templateVar['leagues'] = JSON.parse(value)
-		res.render('leagues.html', templateVar)	
+		templateVar['files'] = ['logout.js', 'deleteLeague.js']
+		if (templateVar['perms'] == 2) {
+			templateVar['admin'] = 1
+		}
+		if (templateVar['perms'] == 2 || templateVar['perms'] == 1) {
+			templateVar['new'] = 1
+		}
+		res.render('leagues.html', templateVar)
 	})
 })
 
@@ -296,20 +311,24 @@ app.get('/league/:id', function(req, res) {
 			CallApi('leagues/'+req.params['id']+'/teams').then(function(teams) {
 				CallApi('leagues/'+req.params['id']+'/teams/requests').then(function(requests) {
 					leagues = JSON.parse(leagues)
-					res.render('league.html', {
-						"title": "League",
-						"name": leagues['name'], 
-						"owner": leagues['owner_id'], 
-						"description": leagues['description'], 
-						"entry_fee": leagues['entry_fee'], 
-						"tournaments": tournaments,
-						"teams": teams,
-						"teams_request": requests,
-						"user": req.session.user, 
-						"id": req.session.user_id, 
-						"key": req.session.key,
-						"files": ['deleteLeague.js', 'deleteLeagueTeam.js', 'editLeagueTeam.js', 'logout.js']
-					})
+					tournaments = JSON.parse(tournaments)
+					teams = JSON.parse(teams)
+					requests = JSON.parse(requests)
+					templateVar = resetTempVar()
+					if (leagues['owner_id'] == templateVar['id']) {
+						templateVar['self'] = true;
+					}
+					templateVar["title"] = "League"
+					templateVar["name"] = leagues['name']
+					templateVar["owner"] = leagues['owner_id']
+					templateVar["description"] = leagues['description']
+					templateVar["entry_fee"] = leagues['entry_fee']
+					templateVar['league_id'] = leagues['id']
+					templateVar["tournaments"] = tournaments
+					templateVar["teams"] = teams
+					templateVar["teams_requests"] = requests
+					templateVar["files"] = ['deleteLeague.js', 'deleteLeagueTeam.js', 'editLeagueTeam.js', 'logout.js', 'joinLeague.js']
+					res.render('league.html', templateVar)
 				})
 			})
 		})
@@ -318,12 +337,20 @@ app.get('/league/:id', function(req, res) {
 
 // new league
 app.get('/leagues/new', function(req, res) {
-	res.render('leagueForm.html', {"user": req.session.user, "key": req.session.key, "id": req.session.user_id, "file": "newLeague.js"})
+	templateVar = resetTempVar()
+	templateVar['files'] = ['newLeague.js']
+	res.render('leagueForm.html', templateVar)
 })
 
 // edit league
 app.get('/league/:id/edit', function(req, res) {
-	res.render('leagueForm.html', {"user": req.session.user, "key": req.session.key, "id": req.session.user_id, "file": "editLeague.js"})
+	templateVar = resetTempVar()
+	templateVar['files'] = ['editLeague.js']
+	if (templateVar['perms'] == 2) {
+			templateVar['admin'] = 1
+	}
+	templateVar['files'] = ['logout.js', 'deleteTeam.js']
+	res.render('leagueForm.html', templateVar)
 })
 
 // show all teams
@@ -332,8 +359,12 @@ app.get('/teams', function(req, res) {
 	CallApi('teams').then(function(value){
 		team = JSON.parse(value)
 		templateVar = resetTempVar()
+		if (templateVar['perms'] == 2) {
+				templateVar['admin'] = 1
+		}
 		templateVar['title'] = 'Teams'
 		templateVar['teams'] = team
+		templateVar["files"] = ['logout.js','deleteTeam.js']
 		res.render('teams.html', templateVar)
 	})
 })
@@ -357,7 +388,7 @@ app.get('/team/:id', function(req, res) {
 				templateVar['description'] = team['description']
 				templateVar['users'] = users
 				templateVar['leagues'] = leagues
-				templateVar["files"] = ['logout.js']
+				templateVar["files"] = ['logout.js','deleteTeam.js']
 				for (var a in users) {
 					templateVar['users'][a]['role'] = roles(users[a])
 				}
@@ -374,10 +405,16 @@ app.get('/teams/new', function(req, res) {
 
 // edit league
 app.get('/team/:id/edit', function(req, res) {
-	res.render('teamForm.html', {"user": req.session.user,  "key": req.session.key, "id": req.session.user_id, "file": "editTeam.js"})
+	templateVar = resetTempVar()
+	templateVar['files'] = ['editTeam.js']
+	if (templateVar['owner_team_id'] == req.params['id']) {
+		templateVar['self'] = 1
+	}
+	res.render('teamForm.html', templateVar)
 })
 
 app.get('/team/:id/join', async function(req, res) {
+	templateVar = resetTempVar()
 	templateVar["files"] = ['joinTeam.js']
 	templateVar['title'] = 'Join Team'
 	res.render('joinTeam.html', templateVar)
@@ -443,23 +480,31 @@ app.get('/tournament/:id', async function(req, res) {
 						})
 					})
 				}
-			})	
+			})
 		})
 	})
 	await Promise.all(promiseArray).then(async function(value) {
 		templateVar = resetTempVar()
-		templateVar['organizer_id'] = resp['tourn']['organizer_id']
-		templateVar['title'] = resp['tourn']['name']
-		templateVar['name'] = resp['tourn']['name']
-		templateVar['type'] = types(resp['tourn'])
-		templateVar['size'] = resp['tourn']['size']
-		templateVar['start_date'] = resp['tourn']['start_date']
-		templateVar['end_date'] = resp['tourn']['end_date']
-		templateVar['entry_fee'] = resp['tourn']['entry_fee']
-		templateVar['description'] = resp['tourn']['description']
-		templateVar['brack'] = resp['brack']
-		templateVar['matches'] = resp['matches']
-		res.render('tournament.html', templateVar)
+		CallApi('leagues/'+resp['tourn']['organizer_id']).then(function(org) {
+			org = JSON.parse(org)
+			if (templateVar['id'] == org['owner_id']) {
+				templateVar['owner'] = 1
+			}
+			templateVar['organizer_id'] = resp['tourn']['organizer_id']
+			templateVar['tid'] = resp['tourn']['id']
+			templateVar['title'] = resp['tourn']['name']
+			templateVar['name'] = resp['tourn']['name']
+			templateVar['type'] = types(resp['tourn'])
+			templateVar['size'] = resp['tourn']['size']
+			templateVar['start_date'] = resp['tourn']['start_date']
+			templateVar['end_date'] = resp['tourn']['end_date']
+			templateVar['entry_fee'] = resp['tourn']['entry_fee']
+			templateVar['description'] = resp['tourn']['description']
+			templateVar['brack'] = resp['brack']
+			templateVar['matches'] = resp['matches']
+			templateVar['files'] = ['logout.js', 'deleteMatch.js']
+			res.render('tournament.html', templateVar)
+		})
 	})
 })
 
@@ -505,7 +550,7 @@ app.get('/matches/:id', async function(req, res) {
 						})
 					}
 				})
-			})	
+			})
 		})
 	})
 	await Promise.all(promiseArray).then(async function(value) {
@@ -519,8 +564,46 @@ app.get('/matches/:id', async function(req, res) {
 		templateVar['end_date'] = resp['match']['end_date']
 		templateVar['match'] = resp['match']
 		templateVar['leaderboard'] = resp['lead']
-		res.render('matches.html', templateVar)	
+		templateVar['files'] = ['logout.js']
+		res.render('matches.html', templateVar)
 	})
+})
+
+app.get('/tournament/:id/matches/new', function(req, res) {
+	CallApi('tournaments/'+req.params['id']).then(function(tourn) {
+		tourn = JSON.parse(tourn)
+		CallApi('leagues/'+tourn['organizer_id']+'/teams').then(function(teams) {
+			teams = JSON.parse(teams)
+			if (templateVar['perms'] == 2) {
+				templateVar['admin'] = 1
+			}
+			templateVar['teams'] = teams
+			templateVar['files'] = ['newMatch.js']
+			templateVar['new'] = 1
+			res.render('matchForm.html', templateVar)
+		})
+	})
+})
+
+app.get('/tournament/:t_id/matches/:id/edit', function(req, res) {
+	CallApi('tournaments/'+req.params['t_id']).then(function(tourn) {
+		tourn = JSON.parse(tourn)
+		CallApi('leagues/'+tourn['organizer_id']+'/teams').then(function(teams) {
+			teams = JSON.parse(teams)
+			if (templateVar['perms'] == 2) {
+				templateVar['admin'] = 1
+			}
+			templateVar['teams'] = teams
+			templateVar['files'] = ['editMatch.js']
+			res.render('matchForm.html', templateVar)
+		})
+	})
+})
+
+app.get('/match_leaderboard/new', function(req, res) {
+})
+
+app.get('/match_leaderboard/:id/edit', function(req, res) {
 })
 
 app.listen(port)
