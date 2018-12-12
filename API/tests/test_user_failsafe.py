@@ -64,7 +64,7 @@ class Requests(unittest.TestCase):
         self.assertEqual(404, r.status_code)
 
     def test_fail_logout_user(self):
-        r = requests.delete(url + 'login', data={'id':1}, headers={'request_key':'root'})
+        r = requests.delete(url + 'login', data={'id':5}, headers={'request_key':'root'})
         self.assertEqual(404, r.status_code)
 
     def test_fail_auth_logout_user(self):

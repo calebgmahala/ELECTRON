@@ -35,12 +35,3 @@ INSERT INTO `matches` (`id`, `tournament_id`, `home_id`, `away_id`, `home_score`
 INSERT INTO `match_leaderboards` (`id`, `player_id`, `team_id`, `match_id`, `score`, `kills`, `assists`, `deaths`, `dpr`) VALUES(1, 1, 1, 1, 10, 10, 2, 8, 76);
 INSERT INTO `match_leaderboards` (`id`, `player_id`, `team_id`, `match_id`, `score`, `kills`, `assists`, `deaths`, `dpr`) VALUES(2, 3, 1, 1, 20, 20, 0, 5, 170);
 INSERT INTO `match_leaderboards` (`id`, `player_id`, `team_id`, `match_id`, `score`, `kills`, `assists`, `deaths`, `dpr`) VALUES(3, 2, 3, 1, 13, 15, 4, 7, 82);
-INSERT INTO `match_leaderboards` (`id`, `player_id`, `team_id`, `match_id`, `score`, `kills`, `assists`, `deaths`, `dpr`) VALUES(4, 1, 1, 1, 10, 10, 2, 8, 76);
-INSERT INTO `match_leaderboards` (`id`, `player_id`, `team_id`, `match_id`, `score`, `kills`, `assists`, `deaths`, `dpr`) VALUES(5, 1, 1, 1, 10, 10, 2, 2, 76);
-INSERT INTO `match_leaderboards` (`id`, `player_id`, `team_id`, `match_id`, `score`, `kills`, `assists`, `deaths`, `dpr`) VALUES(6, 1, 1, 1, 10, 4, 2, 24, 76);
-INSERT INTO `match_leaderboards` (`id`, `player_id`, `team_id`, `match_id`, `score`, `kills`, `assists`, `deaths`, `dpr`) VALUES(7, 1, 1, 1, 10, 10, 2, 5, 76);
-INSERT INTO `match_leaderboards` (`id`, `player_id`, `team_id`, `match_id`, `score`, `kills`, `assists`, `deaths`, `dpr`) VALUES(8, 1, 1, 1, 10, 8, 2, 6, 76);
-INSERT INTO `match_leaderboards` (`id`, `player_id`, `team_id`, `match_id`, `score`, `kills`, `assists`, `deaths`, `dpr`) VALUES(9, 1, 1, 1, 10, 12, 2, 3, 76);
-INSERT INTO `match_leaderboards` (`id`, `player_id`, `team_id`, `match_id`, `score`, `kills`, `assists`, `deaths`, `dpr`) VALUES(10, 1, 1, 1, 10, 10, 2, 7, 76);
-INSERT INTO `match_leaderboards` (`id`, `player_id`, `team_id`, `match_id`, `score`, `kills`, `assists`, `deaths`, `dpr`) VALUES(11, 1, 1, 1, 10, 5, 2, 0, 76);
-INSERT INTO `match_leaderboards` (`id`, `player_id`, `team_id`, `match_id`, `score`, `kills`, `assists`, `deaths`, `dpr`) VALUES(12, 1, 1, 1, 10, 6, 2, 15, 76);

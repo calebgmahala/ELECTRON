@@ -38,6 +38,11 @@ class Requests(unittest.TestCase):
         r = requests.get(url + 'teams/1/leagues')
         self.assertEqual(result, r.json())
 
+    def test_get_team_users(self):
+        result = [{"id":1,"username":"Caleb","permission":2,"is_owner_team":1,"description":"Just your average player","role":1}, {"id":3,"username":"Gucci","permission":0,"is_owner_team":0,"description":"I like shaggy","role":2}]
+        r = requests.get(url + 'teams/1/users')
+        self.assertEqual(result, r.json())
+
     def test_post_team(self):
         r = requests.post(url + 'teams', data={"name": "Test", "description": "Test", "team_key": 'root', "user_id": 1}, headers={"request_key":"root"})
         self.assertEqual(200, r.status_code)

@@ -13,7 +13,6 @@ import string
 import random
 
 app = Flask(__name__)
-app.config['TEMPLATES_AUTO_RELOAD'] = True
 cors = CORS(app)
 env = 'test'
 
@@ -21,7 +20,7 @@ env = 'test'
 def connect_db():
 	return mysql.connector.connect(user='root', database=env, host='localhost')
 
-#show results function (used for get requests)
+#show results function
 def show_results(keys, obj, resp, respit=None, notkeys=[]):
 	for b in range(len(keys)):
 		if respit is None :
@@ -31,7 +30,7 @@ def show_results(keys, obj, resp, respit=None, notkeys=[]):
 			if keys[b] not in notkeys:
 				obj[keys[b]] = resp[respit][b]
 
-# put post function (used for put and post requests to build queries)
+# put post function
 def put_post(var, notkeys, inserts, putpost):
 	if putpost == 'POST':
 		keys = '('
@@ -141,7 +140,8 @@ match_leaderboard_keys = [
 	'deaths',
 	'dpr']
 
-# index static page. made from swagger file. home route
+# home route. documentation made from swagger file
+
 @app.route("/", methods=['GET'])
 def index():
 	return render_template('index.html')
@@ -194,7 +194,7 @@ def User(id):
 		if user is None:
 			return Response(status=404)
 		elif check_auth('users', 'request_key', 'id', id) and check_auth('teams', 'team_key', 'id', request.headers.get('team_id')):
-			if (user[6] == 0): #user[6] is 
+			if (user[6] == 0):
 				cur.execute('UPDATE users SET team_id=' + request.headers.get('team_id') + ' WHERE id=' + str(body['id']))
 				conn.commit()
 				return Response(status=200)
@@ -203,14 +203,15 @@ def User(id):
 		elif len(request.form) is 0:
 			return Response(status=409)
 		elif check_auth('users', 'request_key', 'permission', 2):
-			if body['team_id'] == 'none':
-				cur.execute('UPDATE users SET team_id=Null WHERE id ='+str(id))
-				conn.commit()
-				return Response(status=200)	
-			else:
+			if 'team_id' not in body :
 				cur.execute('UPDATE users SET ' + put_post(user_keys, ['id'], body, 'PUT') + ' WHERE id=' + str(body['id']))
 				conn.commit()
 				return Response(status=200)
+			elif body['team_id'] == 'none':
+				cur.execute('UPDATE users SET team_id=Null WHERE id ='+str(id))
+				conn.commit()
+				return Response(status=200)	
+				
 		elif check_auth('users', 'request_key', 'id', id):
 			if body['team_id'] == 'none':
 				cur.execute('UPDATE users SET team_id=Null WHERE id ='+str(id))
@@ -253,6 +254,7 @@ def User(id):
 
 @app.route("/login", methods=['POST', 'DELETE'])
 def Login():
+	conn.commit()
 	if request.method == 'POST':
 		body = json.dumps(request.form)
 		body = json.loads(body)
@@ -694,21 +696,25 @@ def Tournament(id):
 		else:
 			return Response(status=409)
 
-# bracket routes
+# brackets routes
 @app.route("/tournaments/<int:id>/brackets", methods=['GET', 'POST'])
 def Brackets(id):
 	conn.commit() # allows reload for testing otherwise database is not refreshed
 	if request.method == 'GET':
 		# get all brackets
 		resp = []
-		cur.execute("SELECT * FROM brackets ORDER BY place")
+		cur.execute("SELECT * FROM brackets WHERE tournament_id="+str(id)+" ORDER BY place")
 		brak = cur.fetchall()
-		for a in range(len(brak)):
-			obj = {}
-			show_results(bracket_keys, obj, brak, a)
-			obj['games_played'] = obj['games_won']+obj['games_tied']+obj['games_lost']
-			resp.append(obj)	
-		return json.dumps(resp)
+		if brak == []:
+			resp = Response(json.dumps(resp), status=404)
+			return resp
+		else:
+			for a in range(len(brak)):
+				obj = {}
+				show_results(bracket_keys, obj, brak, a)
+				obj['games_played'] = obj['games_won']+obj['games_tied']+obj['games_lost']
+				resp.append(obj)	
+			return json.dumps(resp)
 	elif request.method == 'POST':
 		body = json.dumps(request.form)
 		body = json.loads(body)
@@ -772,7 +778,7 @@ def Bracket(t_id, brak_id):
 		else:	
 			return Response(status=409)
 
-# match routes
+# matches routes
 @app.route("/tournaments/<int:id>/matches", methods=['GET', 'POST'])
 def Matches(id):
 	conn.commit() # allows reload for testing otherwise database is not refreshed
