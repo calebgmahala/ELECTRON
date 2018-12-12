@@ -22,3 +22,12 @@ Over 100 tests are in place to make sure the system is not only working as it sh
 ##DOCUMENTATION
 
 https://electron-schedule.herokuapp.com/
+
+##WEB APP!
+
+https://electron-schedule-app.herokuapp.com/
+
+##SITUATION
+
+The code here on github is still set for localhost so that I can easily edit and try new things on the site.
+The site is deployed on the above link.
