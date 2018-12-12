@@ -1,5 +1,6 @@
 $(document).ready(function() {
   $("#leaveTeam").click(function(event) {
+    event.preventDefault();
     id = window.location.pathname.split('/')[2]
     $.ajax({
       type: "PUT",

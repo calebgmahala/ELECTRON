@@ -190,8 +190,10 @@ def User(id):
 			return Response(status=404)
 		elif check_auth('users', 'request_key', 'id', id) and check_auth('teams', 'team_key', 'id', request.headers.get('team_id')):
 			if (user[6] == 0):
+				print('test')
 				cur.execute('UPDATE users SET team_id=' + request.headers.get('team_id') + ' WHERE id=' + str(body['id']))
 				conn.commit()
+				print('after')
 				return Response(status=200)
 			else:
 				return Response(status=403)
@@ -200,19 +202,21 @@ def User(id):
 		elif check_auth('users', 'request_key', 'permission', 2):
 			if body['team_id'] == 'none':
 				cur.execute('UPDATE users SET team_id=Null WHERE id ='+str(id))
+				conn.commit()
+				return Response(status=200)	
 			else:
 				cur.execute('UPDATE users SET ' + put_post(user_keys, ['id'], body, 'PUT') + ' WHERE id=' + str(body['id']))
 				conn.commit()
-			return Response(status=200)
+				return Response(status=200)
 		elif check_auth('users', 'request_key', 'id', id):
-			print(body['team_id'])
 			if body['team_id'] == 'none':
-				print('exc')
 				cur.execute('UPDATE users SET team_id=Null WHERE id ='+str(id))
+				conn.commit()
+				return Response(status=200)
 			else:
 				cur.execute('UPDATE users SET ' + put_post(user_keys, ['id', 'request_key', 'permission', 'is_owner_team'], body, 'PUT') + ' WHERE id=' + str(body['id']))
 				conn.commit()
-			return Response(status=200)
+				return Response(status=200)
 		else:
 			return Response(status=409)
 	elif request.method == 'DELETE':
@@ -271,7 +275,7 @@ def Login():
 		if usr is None:
 			return Response(status=404)
 		elif check_auth('users', 'request_key', 'id', str(body['id'])):
-			cur.execute("UPDATE users SET request_key=0 WHERE id="+str(body['id']))
+			cur.execute("UPDATE users SET request_key=Null WHERE id="+str(body['id']))
 			conn.commit()
 			return Response(status=200)
 		else:
@@ -703,6 +707,7 @@ def Brackets(id):
 	elif request.method == 'POST':
 		body = json.dumps(request.form)
 		body = json.loads(body)
+		body['tournament_id'] = str(id)
 		cur.execute("SELECT type FROM tournaments WHERE id="+str(id))
 		tourn = cur.fetchone()
 		if check_auth('organizers', 'organizer_key', 'id', '(SELECT organizer_id FROM tournaments WHERE id=' + str(id) + ')') or check_auth('users', 'request_key', 'id', '(SELECT owner_id FROM organizers WHERE id =(SELECT organizer_id FROM tournaments WHERE id=' + str(id) +'))'):

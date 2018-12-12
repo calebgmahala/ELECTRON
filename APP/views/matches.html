@@ -1,0 +1,80 @@
+{{> _head}}
+<style>
+.title {
+	text-align: center;
+}
+.table {
+	margin: auto;
+	margin-top: 20px;
+}
+td {
+	font-size: 16px !important;
+}
+.data {
+	width: 80%;
+	padding-left: 10%;
+	padding-right: 10%; 
+}
+</style>
+<body>
+	{{> _header}}
+	<div class="body_user">
+		<div class="data">
+			<table class="table">
+				<tr>
+					<th><a href="{{home_id}}">{{#match}}{{#hteam}}{{name}}{{/hteam}}</a>: {{home_score}}{{/match}}</th>
+					<th><a href="{{away_id}}">{{#match}}{{#ateam}}{{name}}{{/ateam}}</a>: {{away_score}}{{/match}}</th>
+				</tr>
+				<tr>
+					<td>
+						<table>
+							<tr>
+								<td>Player</td>
+								<td>Kills</td>
+								<td>Assists</td>
+								<td>Deaths</td>
+								<td>DPR</td>
+								<td>Score</td>		
+							</tr>
+							{{#leaderboard}}
+								<tr>
+									{{#home}}
+											<td><a href='/user/{{player_id}}'>{{#user}}{{username}}{{/user}}</a></td>
+											<td>{{kills}}</td>
+											<td>{{assists}}</td>
+											<td>{{deaths}}</td>
+											<td>{{dpr}}</td>
+									{{/home}}
+								</tr>
+							{{/leaderboard}}
+						</table>
+					</td>
+					<td>
+						<table>
+							<tr>
+								<td>Player</td>
+								<td>Kills</td>
+								<td>Assists</th>
+								<td>Deaths</td>
+								<td>DPR</td>
+								<td>Score</td>		
+							</tr>
+							{{#leaderboard}}
+								<tr>
+									{{#away}}
+											<td><a href='/user/{{player_id}}'>{{#user}}{{username}}{{/user}}</a></td>
+											<td>{{kills}}</td>
+											<td>{{assists}}</td>
+											<td>{{deaths}}</td>
+											<td>{{dpr}}</td>
+									{{/away}}
+								</tr>
+							{{/leaderboard}}
+						</table>
+					</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+</body>
+</html>

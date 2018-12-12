@@ -7,31 +7,38 @@
 	margin: auto;
 	margin-top: 20px;
 }
+.data {
+	width: 80%;
+	padding-left: 10%;
+	padding-right: 10%; 
+}
 </style>
 <body>
 	{{> _header}}
-	<div class="body">
-		<h1 class="title">{{title}}</h1>
-		<table class="table">
-			<tr>
-				<th>Id</th>
-				<th>Username</th>
-				<th>Team</th>
-				<th>Is Owner of Team?</th>
-				<th>Description</th>
-				<th>role</th>
-			</tr>
-			{{#users}}
+	<div class="body_user">
+		<div class="data">
+			<h1 class="title">{{title}}</h1>
+			<table class="table">
 				<tr>
-					<td>{{id}}</td>
-					<td><a href='/user/{{id}}'>{{username}}</td>
-					<td><a href='/team/{{team_id}}'>{{team_id}}</a></td>
-					<td>{{is_owner_team}}</td>
-					<td>{{description}}</td>
-					<td>{{role}}</td>
+					<th>Id</th>
+					<th>Username</th>
+					<th>Team</th>
+					<th>Is Owner of Team?</th>
+					<th>Description</th>
+					<th>role</th>
 				</tr>
-			{{/users}}
-		</table>
+				{{#users}}
+					<tr>
+						<td>{{id}}</td>
+						<td><a href='/user/{{id}}'>{{username}}</td>
+						<td><a href='/team/{{team_id}}'>{{team_id}}</a></td>
+						<td>{{is_owner_team}}</td>
+						<td>{{description}}</td>
+						<td>{{role}}</td>
+					</tr>
+				{{/users}}
+			</table>
+		</div>
 	</div>
 </body>
 </html>

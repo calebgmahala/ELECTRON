@@ -7,37 +7,39 @@
 	margin: auto;
 	margin-top: 20px;
 }
+.data {
+	width: 80%;
+	padding-left: 10%;
+	padding-right: 10%; 
+}
 </style>
 <body>
 	{{> _header}}
-	<div class="body">
-		<h1 class="title">{{title}}</h1>
-		<table class="table">
-			<tr>
-				<th>Id</th>
-				<th>Organizer Id</th>
-				<th>Name</th>
-				<th>Type</th>
-				<th>Size</th>
-				<th>Start Date</th>
-				<th>End Date</th>
-				<th>entry_fee</th>
-				<th>Description</th>
-			</tr>
-			{{#tournaments}}
+	<div class="body_user">
+		<div class="data">
+			<h1 class="title">{{title}}</h1>
+			<table class="table">
 				<tr>
-					<td>{{id}}</td>
-					<td><a href='/league/{{id}}'>{{organizer_id}}</a></td>
-					<td><a href='/tournament/{{id}}'>{{name}}</a></td>
-					<td>{{type}}</td>
-					<td>{{size}}</td>
-					<td>{{start_date}}</td>
-					<td>{{end_date}}</td>
-					<td>${{entry_fee}}</td>
-					<td>{{description}}</td>
+					<th>Name</th>
+					<th>Type</th>
+					<th>Size</th>
+					<th>Start Date</th>
+					<th>End Date</th>
+					<th>entry_fee</th>
+					<th>Description</th>
 				</tr>
-			{{/tournaments}}
-		</table>
+				{{#tournaments}}
+						<td><a href='/tournament/{{id}}'>{{name}}</a></td>
+						<td>{{type}}</td>
+						<td>{{size}}</td>
+						<td>{{start_date}}</td>
+						<td>{{end_date}}</td>
+						<td>${{entry_fee}}</td>
+						<td>{{description}}</td>
+					</tr>
+				{{/tournaments}}
+			</table>
+		</div>
 	</div>
 </body>
 </html>

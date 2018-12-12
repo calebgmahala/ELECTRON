@@ -34,7 +34,7 @@ class Requests(unittest.TestCase):
         self.assertEqual(result, r.json())
 
     def test_post_bracket(self):
-        r = requests.post(url + 'tournaments/2/brackets', data={"team_id": 3, "tournament_id": 2, "place": 1}, headers={'organizer_key':'root'})
+        r = requests.post(url + 'tournaments/2/brackets', data={"team_id": 3, "place": 1}, headers={'organizer_key':'root'})
         self.assertEqual(200, r.status_code)
 
     def test_edit_bracket(self):

@@ -3,8 +3,8 @@
 </style>
 <body>
   {{> _header}}
-  <div class="body">
-    <form id='joinForm'  data-key='{{key}}'>
+  <div class="body_user">
+    <form id='joinForm' data-key='{{key}}' data-id="{{id}}">
       <div class="form-group">
         <label for="team_key">Code</label>
         <input name="team_key" type="text" id="team_key" placeholder="Enter name">
@@ -13,7 +13,7 @@
     </form>
   </div>
   {{#files}}
-  <script type="text/javascript" src="/scripts/{{.}}"></script>
+  <script type="text/javascript" src="/scripts/{{files}}"></script>
   {{/files}}
 </body>
 </html>

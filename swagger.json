@@ -1,0 +1,1697 @@
+{
+  "tags": [
+    {
+      "name": "Users",
+      "description": "Everything about users"
+    },
+    {
+      "name": "Teams",
+      "description": "Has users and linked to organizers, leagues, tournaments, and matches"
+    },
+    {
+      "name": "Organizers",
+      "description": "Has teams and tournaments"
+    },
+    {
+      "name": "Tournaments",
+      "description": "Linked to Organizer. Has matches and brackets"
+    },
+    {
+      "name": "Brackets",
+      "description": "Linked to tournaments. Show's placement in league. Has teams"
+    },
+    {
+      "name": "Matches",
+      "description": "Linked to tournaments. Has match leaderboards and teams"
+    },
+    {
+      "name": "Match Leaderboards",
+      "description": "Linked to Matches. has users and a team Id."
+    },
+    {
+      "name": "LeagueTeams",
+      "description": "Connection of leagues and teams"
+    }
+  ],
+  "paths": {
+    "/users": {
+      "get": {
+        "summary": "Get all users",
+        "description": "Get all users",
+        "tags": [
+          "Users"
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns all data for all users",
+            "x-oad-type": "response"
+          }
+        }
+      },
+      "post": {
+        "summary": "New User",
+        "description": "Sign up and make a user",
+        "tags": [
+          "Users"
+        ],
+        "responses": {
+          "200": {
+            "description": "Sign up",
+            "x-oad-type": "response"
+          }
+        },
+        "parameters": [
+          {
+            "name": "username",
+            "in": "formData",
+            "description": "name of user",
+            "required": true,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "password",
+            "in": "formData",
+            "description": "password for user",
+            "required": true,
+            "type": "string",
+            "x-oad-type": "parameter"
+          }
+        ]
+      },
+      "x-oad-type": "operation"
+    },
+    "/users/{id}": {
+      "get": {
+        "summary": "get one user",
+        "description": "get one user",
+        "tags": [
+          "Users"
+        ],
+        "responses": {
+          "200": {
+            "description": "all data for one user",
+            "x-oad-type": "response"
+          }
+        }
+      },
+      "put": {
+        "summary": "edit one user",
+        "description": "edit one user",
+        "tags": [
+          "Users"
+        ],
+        "responses": {
+          "200": {
+            "description": "edited user",
+            "x-oad-type": "response"
+          }
+        },
+        "parameters": [
+          {
+            "name": "username",
+            "in": "formData",
+            "description": "name of user",
+            "required": false,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "password",
+            "in": "formData",
+            "description": "password for user",
+            "required": false,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "request_key",
+            "in": "formData",
+            "description": "special key",
+            "required": false,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "permission",
+            "in": "formData",
+            "description": "permission of user",
+            "required": false,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "team_id",
+            "in": "formData",
+            "description": "users team",
+            "required": false,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "is_owner_team",
+            "in": "formData",
+            "description": "shows ownership of team",
+            "required": false,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "description",
+            "in": "formData",
+            "description": "description of user",
+            "required": false,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "role",
+            "in": "formData",
+            "description": "permission of user",
+            "required": false,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "request_key",
+            "in": "header",
+            "description": "key passed to allow actions",
+            "required": true,
+            "type": "string",
+            "x-oad-type": "parameter"
+          }
+        ]
+      },
+      "delete": {
+        "summary": "delete user",
+        "description": "delete user",
+        "tags": [
+          "Users"
+        ],
+        "responses": {
+          "200": {
+            "description": "successfully deleted user\ndeletes team if owner\nupdates matches\ndeletes league if owner",
+            "x-oad-type": "response"
+          }
+        },
+        "parameters": [
+          {
+            "name": "request_key",
+            "in": "header",
+            "description": "key allows actions on user",
+            "required": true,
+            "type": "string",
+            "x-oad-type": "parameter"
+          }
+        ]
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "id of user",
+          "required": true,
+          "type": "integer",
+          "format": "int32",
+          "x-oad-type": "parameter"
+        }
+      ],
+      "x-oad-type": "operation"
+    },
+    "/login": {
+      "post": {
+        "summary": "allows user to login",
+        "description": "set request_key for user so user can do actions",
+        "tags": [
+          "Users"
+        ],
+        "responses": {
+          "200": {
+            "description": "returns key that user can send along with requests to allow actions",
+            "x-oad-type": "response"
+          }
+        },
+        "parameters": [
+          {
+            "name": "username",
+            "in": "formData",
+            "description": "username of user logging in",
+            "required": true,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "password",
+            "in": "formData",
+            "description": "password used to authenticate user",
+            "required": true,
+            "type": "string",
+            "x-oad-type": "parameter"
+          }
+        ]
+      },
+      "delete": {
+        "summary": "logout",
+        "description": "removes request_key data from user. dissallowing requests from that user",
+        "tags": [
+          "Users"
+        ],
+        "responses": {
+          "200": {
+            "description": "logged out",
+            "x-oad-type": "response"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "formData",
+            "description": "id of user signing out",
+            "required": true,
+            "type": "integer",
+            "format": "int32",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "request_key",
+            "in": "header",
+            "description": "passed to authenticate user",
+            "required": true,
+            "type": "string",
+            "x-oad-type": "parameter"
+          }
+        ]
+      },
+      "x-oad-type": "operation"
+    },
+    "/leagues": {
+      "get": {
+        "summary": "Get all leagues",
+        "description": "Get all leagues",
+        "tags": [
+          "Organizers"
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns all data for all leagues",
+            "x-oad-type": "response"
+          }
+        }
+      },
+      "post": {
+        "summary": "New League",
+        "description": "Create a new organizer",
+        "tags": [
+          "Organizers"
+        ],
+        "responses": {
+          "200": {
+            "description": "New organizer",
+            "x-oad-type": "response"
+          }
+        },
+        "parameters": [
+          {
+            "name": "name",
+            "in": "formData",
+            "description": "name of league",
+            "required": true,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "owner_id",
+            "in": "formData",
+            "description": "owner user",
+            "required": true,
+            "type": "integer",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "organizer_key",
+            "in": "formData",
+            "description": "key used for edits. Give it to admins of organizer",
+            "required": true,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "entry_fee",
+            "in": "formData",
+            "description": "money in cents",
+            "required": true,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "description",
+            "in": "formData",
+            "description": "description of league",
+            "required": true,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "request_key",
+            "in": "header",
+            "description": "key passed to allow actions",
+            "required": true,
+            "type": "string",
+            "x-oad-type": "parameter"
+          }
+        ]
+      },
+      "x-oad-type": "operation"
+    },
+    "/leagues/{id}": {
+      "get": {
+        "summary": "Get all data of one league",
+        "description": "get all data of one league",
+        "tags": [
+          "Organizers"
+        ],
+        "responses": {
+          "200": {
+            "description": "returns all data for one league",
+            "x-oad-type": "response"
+          }
+        }
+      },
+      "put": {
+        "summary": "Edit League",
+        "description": "Edit a organizer",
+        "tags": [
+          "Organizers"
+        ],
+        "responses": {
+          "200": {
+            "description": "New organizer",
+            "x-oad-type": "response"
+          }
+        },
+        "parameters": [
+          {
+            "name": "name",
+            "in": "formData",
+            "description": "name of league",
+            "required": false,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "owner_id",
+            "in": "formData",
+            "description": "owner user",
+            "required": false,
+            "type": "integer",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "organizer_key",
+            "in": "formData",
+            "description": "key used for edits. Give it to admins of organizer",
+            "required": false,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "entry_fee",
+            "in": "formData",
+            "description": "money in cents",
+            "required": false,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "description",
+            "in": "formData",
+            "description": "description of league",
+            "required": false,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "request_key",
+            "in": "header",
+            "description": "key passed to allow actions",
+            "required": true,
+            "type": "string",
+            "x-oad-type": "parameter"
+          }
+        ]
+      },
+      "delete": {
+        "summary": "delete league",
+        "description": "deletes a league",
+        "tags": [
+          "Organizers"
+        ],
+        "responses": {
+          "200": {
+            "description": "successfully deleted league.\nupdates tournaments,\nremoves teams from league connections",
+            "x-oad-type": "response"
+          }
+        },
+        "parameters": [
+          {
+            "name": "request_key",
+            "in": "header",
+            "description": "key passed to allow actions",
+            "required": true,
+            "type": "string",
+            "x-oad-type": "parameter"
+          }
+        ]
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "id of league",
+          "required": true,
+          "type": "integer",
+          "format": "int32",
+          "x-oad-type": "parameter"
+        }
+      ],
+      "x-oad-type": "operation"
+    },
+    "/leagues/{id}/teams": {
+      "get": {
+        "summary": "get all league teams",
+        "description": "get all league teams",
+        "tags": [
+          "LeagueTeams"
+        ],
+        "responses": {
+          "200": {
+            "description": "returns all teams of leagues",
+            "x-oad-type": "response"
+          }
+        }
+      },
+      "post": {
+        "summary": "ask to join league",
+        "description": "sends request to join team",
+        "tags": [
+          "LeagueTeams"
+        ],
+        "responses": {
+          "200": {
+            "description": "team added to requests",
+            "x-oad-type": "response"
+          }
+        },
+        "parameters": [
+          {
+            "name": "team_id",
+            "in": "formData",
+            "description": "id of team submitting",
+            "required": true,
+            "type": "integer",
+            "format": "int32",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "request_key",
+            "in": "header",
+            "description": "key allowing for request action",
+            "required": true,
+            "type": "string",
+            "x-oad-type": "parameter"
+          }
+        ]
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "id of league to get teams from",
+          "required": true,
+          "type": "integer",
+          "format": "int32",
+          "x-oad-type": "parameter"
+        }
+      ],
+      "x-oad-type": "operation"
+    },
+    "/leagues/{id}/teams/requests": {
+      "get": {
+        "summary": "get all league teams that are still in requests phase",
+        "description": "get all league teams that are still in requests phase",
+        "tags": [
+          "LeagueTeams"
+        ],
+        "responses": {
+          "200": {
+            "description": "returns all teams of leagues currently waiting acceptance",
+            "x-oad-type": "response"
+          }
+        }
+      },
+      "post": {
+        "summary": "ask to join league",
+        "description": "sends request to join team",
+        "tags": [
+          "LeagueTeams"
+        ],
+        "responses": {
+          "200": {
+            "description": "team added to requests",
+            "x-oad-type": "response"
+          }
+        },
+        "parameters": [
+          {
+            "name": "team_id",
+            "in": "formData",
+            "description": "id of team submitting",
+            "required": true,
+            "type": "integer",
+            "format": "int32",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "request_key",
+            "in": "header",
+            "description": "key allowing for request action",
+            "required": true,
+            "type": "string",
+            "x-oad-type": "parameter"
+          }
+        ]
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "id of league to get teams from",
+          "required": true,
+          "type": "integer",
+          "format": "int32",
+          "x-oad-type": "parameter"
+        }
+      ],
+      "x-oad-type": "operation"
+    },
+    "/leagues/{org_id}/teams{t_id}": {
+      "get": {
+        "summary": "get league team status of team",
+        "description": "get league team status of team",
+        "tags": [
+          "LeagueTeams"
+        ],
+        "responses": {
+          "200": {
+            "description": "returns all teams of leagues",
+            "x-oad-type": "response"
+          }
+        }
+      },
+      "put": {
+        "summary": "accept league",
+        "description": "accepts team to league or moves team back to request phase",
+        "tags": [
+          "LeagueTeams"
+        ],
+        "responses": {
+          "200": {
+            "description": "team added to requests",
+            "x-oad-type": "response"
+          }
+        },
+        "parameters": [
+          {
+            "name": "request",
+            "in": "formData",
+            "description": "accept or move to team to requests",
+            "required": true,
+            "type": "integer",
+            "format": "int32",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "request_key",
+            "in": "header",
+            "description": "key allowing for request action",
+            "required": true,
+            "type": "string",
+            "x-oad-type": "parameter"
+          }
+        ]
+      },
+      "delete": {
+        "summary": "delete league",
+        "description": "deletes a league",
+        "tags": [
+          "LeagueTeams"
+        ],
+        "responses": {
+          "200": {
+            "description": "successfully deleted league.\nupdates tournaments,\nremoves teams from league connections",
+            "x-oad-type": "response"
+          }
+        },
+        "parameters": [
+          {
+            "name": "request_key",
+            "in": "header",
+            "description": "key passed to allow actions",
+            "required": true,
+            "type": "string",
+            "x-oad-type": "parameter"
+          }
+        ]
+      },
+      "parameters": [
+        {
+          "name": "org_id",
+          "in": "path",
+          "description": "id of league to get teams from",
+          "required": true,
+          "type": "integer",
+          "format": "int32",
+          "x-oad-type": "parameter"
+        },
+        {
+          "name": "t_id",
+          "in": "path",
+          "description": "id of team",
+          "required": true,
+          "type": "integer",
+          "format": "int32",
+          "x-oad-type": "parameter"
+        }
+      ],
+      "x-oad-type": "operation"
+    },
+    "/leagues/{id}/tournaments": {
+      "get": {
+        "summary": "get leagues",
+        "description": "get tournaments of specific leagues",
+        "tags": [
+          "Tournaments"
+        ],
+        "responses": {
+          "200": {
+            "description": "returns all data for all tournaments of a league",
+            "x-oad-type": "response"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "id of league",
+          "required": true,
+          "type": "integer",
+          "format": "int32",
+          "x-oad-type": "parameter"
+        }
+      ],
+      "x-oad-type": "operation"
+    },
+    "/teams": {
+      "get": {
+        "summary": "get all teams",
+        "description": "get all teams",
+        "tags": [
+          "Teams"
+        ],
+        "responses": {
+          "200": {
+            "description": "get all teams data",
+            "x-oad-type": "response"
+          }
+        }
+      },
+      "post": {
+        "summary": "New team",
+        "description": "makes a new team. only works if you are off a team",
+        "tags": [
+          "Teams"
+        ],
+        "responses": {
+          "200": {
+            "description": "all team data for all teams",
+            "x-oad-type": "response"
+          }
+        },
+        "parameters": [
+          {
+            "name": "name",
+            "in": "formData",
+            "description": "name of team",
+            "required": true,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "team_key",
+            "in": "formData",
+            "description": "join key so others can join your team. set this to a code you can pass to your friends",
+            "required": true,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "description",
+            "in": "formData",
+            "description": "description of team",
+            "required": true,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "user_id",
+            "in": "formData",
+            "description": "id of owner",
+            "required": true,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "request_key",
+            "in": "header",
+            "description": "key authenticating user",
+            "required": true,
+            "type": "string",
+            "x-oad-type": "parameter"
+          }
+        ]
+      },
+      "x-oad-type": "operation"
+    },
+    "/teams/{id}": {
+      "get": {
+        "summary": "get specific team",
+        "description": "get one teams data",
+        "tags": [
+          "Teams"
+        ],
+        "responses": {
+          "200": {
+            "description": "all data for one team",
+            "x-oad-type": "response"
+          }
+        }
+      },
+      "put": {
+        "summary": "edit specific team",
+        "description": "edit one team",
+        "tags": [
+          "Teams"
+        ],
+        "responses": {
+          "200": {
+            "description": "edited data for team",
+            "x-oad-type": "response"
+          }
+        },
+        "parameters": [
+          {
+            "name": "name",
+            "in": "formData",
+            "description": "name of team",
+            "required": false,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "team_key",
+            "in": "formData",
+            "description": "join key so others can join your team. set this to a code you can pass to your friends",
+            "required": false,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "description",
+            "in": "formData",
+            "description": "description of team",
+            "required": false,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "user_id",
+            "in": "formData",
+            "description": "id of owner",
+            "required": false,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "request_key",
+            "in": "header",
+            "description": "key authenticating user",
+            "required": false,
+            "type": "string",
+            "x-oad-type": "parameter"
+          }
+        ]
+      },
+      "delete": {
+        "summary": "delete team",
+        "description": "delete team, remove team id from current players.",
+        "tags": [
+          "Teams"
+        ],
+        "responses": {
+          "200": {
+            "description": "successfully deleted team",
+            "x-oad-type": "response"
+          }
+        },
+        "parameters": [
+          {
+            "name": "request_key",
+            "in": "header",
+            "description": "allow delete team action",
+            "required": true,
+            "type": "string",
+            "x-oad-type": "parameter"
+          }
+        ]
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "id of team",
+          "required": true,
+          "type": "integer",
+          "format": "int32",
+          "x-oad-type": "parameter"
+        }
+      ],
+      "x-oad-type": "operation"
+    },
+    "/teams/{id}/leagues": {
+      "get": {
+        "summary": "get all leagues",
+        "description": "get all leagues of a team",
+        "tags": [
+          "Organizers"
+        ],
+        "responses": {
+          "200": {
+            "description": "all data for all leagues of a team",
+            "x-oad-type": "response"
+          }
+        }
+      },
+      "delete": {
+        "summary": "delete league connection",
+        "description": "remove team from league",
+        "tags": [
+          "LeagueTeams"
+        ],
+        "responses": {
+          "200": {
+            "description": "team removed from league",
+            "x-oad-type": "response"
+          }
+        },
+        "parameters": [
+          {
+            "name": "request_key",
+            "in": "header",
+            "description": "key to authenticate user",
+            "required": true,
+            "type": "string",
+            "x-oad-type": "parameter"
+          }
+        ]
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "id of team",
+          "required": true,
+          "type": "integer",
+          "format": "int32",
+          "x-oad-type": "parameter"
+        }
+      ],
+      "x-oad-type": "operation"
+    },
+    "/teams/{id}/users": {
+      "get": {
+        "summary": "get users",
+        "description": "get users of team",
+        "tags": [
+          "Users"
+        ],
+        "responses": {
+          "200": {
+            "description": "gets all user data for users",
+            "x-oad-type": "response"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "id of team",
+          "required": true,
+          "type": "integer",
+          "format": "int32",
+          "x-oad-type": "parameter"
+        }
+      ],
+      "x-oad-type": "operation"
+    },
+    "/tournaments": {
+      "get": {
+        "summary": "get all tournaments",
+        "description": "gets all tournament data for all tournaments",
+        "tags": [
+          "Tournaments"
+        ],
+        "responses": {
+          "200": {
+            "description": "all data for tournaments",
+            "x-oad-type": "response"
+          }
+        }
+      },
+      "post": {
+        "summary": "create new tournament",
+        "description": "creats a new tournament",
+        "tags": [
+          "Tournaments"
+        ],
+        "responses": {
+          "200": {
+            "description": "made a new tournament",
+            "x-oad-type": "response"
+          }
+        },
+        "parameters": [
+          {
+            "name": "organizer_id",
+            "in": "formData",
+            "description": "link to organizer",
+            "required": true,
+            "type": "integer",
+            "format": "int32",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "name",
+            "in": "formData",
+            "description": "the name of the tournament",
+            "required": true,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "type",
+            "in": "formData",
+            "description": "type of tournament.",
+            "required": true,
+            "type": "integer",
+            "format": "int32",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "size",
+            "in": "formData",
+            "description": "max number of teams",
+            "required": true,
+            "type": "integer",
+            "format": "int32",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "start_date",
+            "in": "formData",
+            "description": "start date of tournament",
+            "required": true,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "entry_fee",
+            "in": "formData",
+            "description": "price to enter tournament",
+            "required": true,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "description",
+            "in": "formData",
+            "description": "description of tournament",
+            "required": true,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "request_key",
+            "in": "header",
+            "description": "authentication in case of owner",
+            "required": true,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "organizer_key",
+            "in": "header",
+            "description": "code passed that allows for organizer admin privleges",
+            "required": false,
+            "type": "string",
+            "x-oad-type": "parameter"
+          }
+        ]
+      },
+      "x-oad-type": "operation"
+    },
+    "/tournaments/{id}": {
+      "get": {
+        "summary": "get a tournament",
+        "description": "gets all data for one tournament",
+        "tags": [
+          "Tournaments"
+        ],
+        "responses": {
+          "200": {
+            "description": "gets one tournament",
+            "x-oad-type": "response"
+          }
+        }
+      },
+      "put": {
+        "summary": "edit tournament",
+        "description": "edits a tournament",
+        "tags": [
+          "Tournaments"
+        ],
+        "responses": {
+          "200": {
+            "description": "edited tournament",
+            "x-oad-type": "response"
+          }
+        },
+        "parameters": [
+          {
+            "name": "organizer_id",
+            "in": "formData",
+            "description": "link to organizer",
+            "required": false,
+            "type": "integer",
+            "format": "int32",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "name",
+            "in": "formData",
+            "description": "the name of the tournament",
+            "required": false,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "type",
+            "in": "formData",
+            "description": "type of tournament.",
+            "required": false,
+            "type": "integer",
+            "format": "int32",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "size",
+            "in": "formData",
+            "description": "max number of teams",
+            "required": false,
+            "type": "integer",
+            "format": "int32",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "start_date",
+            "in": "formData",
+            "description": "start date of tournament",
+            "required": false,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "entry_fee",
+            "in": "formData",
+            "description": "price to enter tournament",
+            "required": false,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "description",
+            "in": "formData",
+            "description": "description of tournament",
+            "required": false,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "request_key",
+            "in": "header",
+            "description": "authentication in case of owner",
+            "required": false,
+            "type": "string",
+            "x-oad-type": "parameter"
+          }
+        ]
+      },
+      "delete": {
+        "summary": "deletes a tournament",
+        "description": "delete a single tournament and all matches with it",
+        "tags": [
+          "Tournaments"
+        ],
+        "responses": {
+          "200": {
+            "description": "successfully deleted",
+            "x-oad-type": "response"
+          }
+        },
+        "parameters": [
+          {
+            "name": "request_key",
+            "in": "path",
+            "description": "authenticate league owner",
+            "required": true,
+            "type": "string",
+            "x-oad-type": "parameter"
+          }
+        ]
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "id of tournament",
+          "required": true,
+          "type": "integer",
+          "format": "int32",
+          "x-oad-type": "parameter"
+        }
+      ],
+      "x-oad-type": "operation"
+    },
+    "/tournaments/{id}/brackets": {
+      "get": {
+        "summary": "get all brackets",
+        "description": "get all brackets in a tournament",
+        "tags": [
+          "Brackets"
+        ],
+        "responses": {
+          "200": {
+            "description": "gets all data for all brackets in tournament",
+            "x-oad-type": "response"
+          }
+        }
+      },
+      "post": {
+        "summary": "make new bracket",
+        "description": "make a new bracket",
+        "tags": [
+          "Brackets"
+        ],
+        "responses": {
+          "200": {
+            "description": "successfully created bracket",
+            "x-oad-type": "response"
+          }
+        },
+        "parameters": [
+          {
+            "name": "team_id",
+            "in": "formData",
+            "description": "team being added to bracket",
+            "required": true,
+            "type": "integer",
+            "format": "int32",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "place",
+            "in": "formData",
+            "description": "placement of team in bracket",
+            "required": true,
+            "type": "integer",
+            "format": "int32",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "request_key",
+            "in": "header",
+            "description": "key to authenticate user",
+            "required": true,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "organizer_key",
+            "in": "header",
+            "description": "key used to authenticate organizer admin",
+            "required": true,
+            "type": "string",
+            "x-oad-type": "parameter"
+          }
+        ]
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "id of tournaments",
+          "required": true,
+          "type": "integer",
+          "format": "int32",
+          "x-oad-type": "parameter"
+        }
+      ],
+      "x-oad-type": "operation"
+    },
+    "/tournaments/{t_id}/brackets/{brack_id}": {
+      "get": {
+        "summary": "get bracket",
+        "description": "get bracket",
+        "tags": [
+          "Brackets"
+        ],
+        "responses": {
+          "200": {
+            "description": "all bracket data for one bracket",
+            "x-oad-type": "response"
+          }
+        }
+      },
+      "put": {
+        "summary": "edit bracket",
+        "description": "edit bracket",
+        "tags": [
+          "Brackets"
+        ],
+        "responses": {
+          "200": {
+            "description": "successfully edited bracket",
+            "x-oad-type": "response"
+          }
+        },
+        "parameters": [
+          {
+            "name": "tournament_id",
+            "in": "formData",
+            "description": "sets tournament id",
+            "required": false,
+            "type": "integer",
+            "format": "int32",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "team_id",
+            "in": "formData",
+            "description": "id of team",
+            "required": false,
+            "type": "integer",
+            "format": "int32",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "user_id",
+            "in": "formData",
+            "description": "set user for bracket rung",
+            "required": false,
+            "type": "integer",
+            "format": "int32",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "place",
+            "in": "formData",
+            "description": "set place of bracket",
+            "required": false,
+            "type": "integer",
+            "format": "int32",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "games_won",
+            "in": "formData",
+            "description": "games won",
+            "required": false,
+            "type": "integer",
+            "format": "int32",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "games_tied",
+            "in": "formData",
+            "description": "games tied",
+            "required": false,
+            "type": "integer",
+            "format": "int32",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "games_lost",
+            "in": "formData",
+            "description": "games_lost",
+            "required": false,
+            "type": "integer",
+            "format": "int32",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "score",
+            "in": "formData",
+            "description": "score of rung",
+            "required": false,
+            "type": "integer",
+            "format": "int32",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "request_key",
+            "in": "header",
+            "description": "key to authenticate user",
+            "required": true,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "organizer_key",
+            "in": "header",
+            "description": "key to authenticate admin",
+            "required": false,
+            "type": "string",
+            "x-oad-type": "parameter"
+          }
+        ]
+      },
+      "delete": {
+        "summary": "delete bracket",
+        "description": "delete bracket",
+        "tags": [
+          "Brackets"
+        ],
+        "responses": {
+          "200": {
+            "description": "bracket deleted",
+            "x-oad-type": "response"
+          }
+        },
+        "parameters": [
+          {
+            "name": "request_key",
+            "in": "header",
+            "description": "key to authenticate user",
+            "required": true,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "organizer_key",
+            "in": "header",
+            "description": "key to authenticate organizer admin",
+            "required": false,
+            "type": "string",
+            "x-oad-type": "parameter"
+          }
+        ]
+      },
+      "parameters": [
+        {
+          "name": "t_id",
+          "in": "path",
+          "description": "tournament id",
+          "required": true,
+          "type": "string",
+          "x-oad-type": "parameter"
+        },
+        {
+          "name": "brack_id",
+          "in": "path",
+          "description": "bracket id",
+          "required": true,
+          "type": "string",
+          "x-oad-type": "parameter"
+        }
+      ],
+      "x-oad-type": "operation"
+    },
+    "/tournaments/{id}/matches": {
+      "get": {
+        "summary": "get all matches",
+        "description": "get all matches in a tournament",
+        "tags": [
+          "Matches"
+        ],
+        "responses": {
+          "200": {
+            "description": "gets all data for all matches in tournament",
+            "x-oad-type": "response"
+          }
+        }
+      },
+      "post": {
+        "summary": "make new match",
+        "description": "make a new match",
+        "tags": [
+          "Matches"
+        ],
+        "responses": {
+          "200": {
+            "description": "successfully created match",
+            "x-oad-type": "response"
+          }
+        },
+        "parameters": [
+          {
+            "name": "home_id",
+            "in": "formData",
+            "description": "home team being added to match",
+            "required": true,
+            "type": "integer",
+            "format": "int32",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "away_id",
+            "in": "formData",
+            "description": "away team being added to match",
+            "required": true,
+            "type": "integer",
+            "format": "int32",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "start_date",
+            "in": "formData",
+            "description": "start date for match",
+            "required": true,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "request_key",
+            "in": "header",
+            "description": "key to authenticate user",
+            "required": true,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "organizer_key",
+            "in": "header",
+            "description": "key used to authenticate organizer admin",
+            "required": true,
+            "type": "string",
+            "x-oad-type": "parameter"
+          }
+        ]
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "id of tournaments",
+          "required": true,
+          "type": "integer",
+          "format": "int32",
+          "x-oad-type": "parameter"
+        }
+      ],
+      "x-oad-type": "operation"
+    },
+    "/matches/{id}": {
+      "get": {
+        "summary": "get one match",
+        "description": "get all match data for one match",
+        "tags": [
+          "Matches"
+        ],
+        "responses": {
+          "200": {
+            "description": "gets all data for one match",
+            "x-oad-type": "response"
+          }
+        }
+      },
+      "put": {
+        "summary": "edit match",
+        "description": "edit match",
+        "tags": [
+          "Matches"
+        ],
+        "responses": {
+          "200": {
+            "description": "successfully edited match",
+            "x-oad-type": "response"
+          }
+        },
+        "parameters": [
+          {
+            "name": "tournament_id",
+            "in": "formData",
+            "description": "tournament match is apart of",
+            "required": false,
+            "type": "integer",
+            "format": "int32",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "home_id",
+            "in": "formData",
+            "description": "home team being added to match",
+            "required": false,
+            "type": "integer",
+            "format": "int32",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "away_id",
+            "in": "formData",
+            "description": "away team being added to match",
+            "required": false,
+            "type": "integer",
+            "format": "int32",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "home_score",
+            "in": "formData",
+            "description": "home score",
+            "required": false,
+            "type": "integer",
+            "format": "int32",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "away_score",
+            "in": "formData",
+            "description": "home score",
+            "required": false,
+            "type": "integer",
+            "format": "int32",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "start_date",
+            "in": "formData",
+            "description": "start date for match",
+            "required": false,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "end_date",
+            "in": "formData",
+            "description": "start date for match",
+            "required": false,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "request_key",
+            "in": "header",
+            "description": "key to authenticate user",
+            "required": true,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "organizer_key",
+            "in": "header",
+            "description": "key used to authenticate organizer admin",
+            "required": false,
+            "type": "string",
+            "x-oad-type": "parameter"
+          }
+        ]
+      },
+      "delete": {
+        "summary": "delete match",
+        "description": "delete match",
+        "tags": [
+          "Matches"
+        ],
+        "responses": {
+          "200": {
+            "description": "match deleted",
+            "x-oad-type": "response"
+          }
+        },
+        "parameters": [
+          {
+            "name": "request_key",
+            "in": "header",
+            "description": "key to authenticate user",
+            "required": true,
+            "type": "string",
+            "x-oad-type": "parameter"
+          },
+          {
+            "name": "organizer_key",
+            "in": "header",
+            "description": "key to authenticate organizer admin",
+            "required": false,
+            "type": "string",
+            "x-oad-type": "parameter"
+          }
+        ]
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "id of match",
+          "required": true,
+          "type": "integer",
+          "format": "int32",
+          "x-oad-type": "parameter"
+        }
+      ],
+      "x-oad-type": "operation"
+    }
+  },
+  "info": {
+    "title": "Electeams API",
+    "version": "1.0.0",
+    "description": "Feeder API for electeams",
+    "contact": {
+      "name": "Caleb",
+      "email": "calebgmahala@gmail.com"
+    }
+  },
+  "host": "electron-schedule.herokuapp.com",
+  "basePath": "/",
+  "swagger": "2.0"
+}

@@ -10,38 +10,60 @@
 </style>
 <body>
 	{{> _header}}
-	<div class="body">
-		<h1 class="title">{{name}}</h1>
-		<h2>${{entry_fee}}</h2>
-		<h2>{{start_date}}</h2>
-		<h2>{{end_date}}</h2>
-		<p>size: {{size}}</p>
-		<p>{{type}}</p>
-		<p>{{description}}</p>
-		<table class="table">
-			<tr>
-				<th>Place</th>
-				<th>Id</th>
-				<th>Team Id</th>
-				<th>User Id</th>
-				<th>W</th>
-				<th>T</th>
-				<th>L</th>
-				<th>Score</th>
-			</tr>
-			{{#brack}}
+	<div class="body_user">
+		<div class="slider">
+			<h2 class="name">{{name}}</h2>
+			<p>${{entry_fee}}</p>
+			<p>{{start_date}}</p>
+			<p>{{end_date}}</p>
+			<p>size: {{size}}</p>
+			<p>{{type}}</p>
+			<p>{{description}}</p>
+		</div>
+		<div class="data">
+			<h1 class="title">Placement</h1>
+			<table class="table">
 				<tr>
-					<td>{{place}}</td>
-					<td>{{id}}</td>
-					<td><a href='/team/{{id}}'>{{team_id}}</td>
-					<td><a href='/user/{{id}}'>{{user_id}}</td>
-					<td>{{games_won}}</td>
-					<td>{{games_tied}}</td>
-					<td>{{games_lost}}</td>
-					<td>{{score}}</td>
+					<th>Place</th>
+					<th>Team</th>
+					<th>W</th>
+					<th>T</th>
+					<th>L</th>
+					<th>Score</th>
 				</tr>
-			{{/brack}}
-		</table>
+				{{#brack}}
+					<tr>
+						<td>{{place}}</td>
+						<td><a href='/team/{{team_id}}'>{{team}}</a></td>
+						<td>{{games_won}}</td>
+						<td>{{games_tied}}</td>
+						<td>{{games_lost}}</td>
+						<td>{{score}}</td>
+					</tr>
+				{{/brack}}
+			</table>
+			<h1 class="title">Matches</h1>
+			<table class="table">
+				<tr>
+					<th>Home</th>
+					<th>Score</th>
+					<th>Away</th>
+					<th>Score</th>
+					<th>Start</th>
+					<th>End</th>
+				</tr>
+				{{#matches}}
+					<tr>
+						<td><a href='/team/{{home_id}}'>{{hteam}}</a></td>
+						<td>{{home_score}}</td>
+						<td><a href='/team/{{away_id}}'>{{ateam}}</a></td>
+						<td>{{away_score}}</td>
+						<td>{{start_date}}</td>
+						<td>{{end_date}}</td>
+					</tr>
+				{{/matches}}
+			</table>
+		</div>
 	</div>
 </body>
 </html>

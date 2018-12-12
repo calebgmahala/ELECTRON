@@ -20,26 +20,17 @@ h2 {
 </style>
 <body>
 	{{> _header}}
-	<div class="body">
-		<h1 class="title">{{name}}</h1>
-		<div class="cardHolder">
-			<div class="card">
-				<h3>Information</h3>
-				<p>Owner: {{owner}}</p>
-				<p>{{description}}</p>
-				<p class="money">${{entry_fee}}</p>
-				<input id="deleteLeague" type="button" value="Delete" data-key="{{key}}">
-			</div>
-			{{{tournaments}}}
+	<div class="body_user">
+		<div class="slider">
+			<h1 class="title">{{name}}</h1>
+			<p>Owner: {{owner}}</p>
+			<p>{{description}}</p>
+			<p class="money">${{entry_fee}}</p>
+			<input id="deleteLeague" type="button" value="Delete" data-key="{{key}}">
 		</div>
-		<h2>Teams</h2>
-		<table class="table">
-			{{{teams}}}
-		</table>
-		<h2>Requests</h2>
-		<table class="table">
-			{{{teams_request}}}
-		</table>
+		<div class="m">
+			
+		</div>
 	</div>
 	{{#files}}
 	<script type="text/javascript" src="/scripts/{{.}}"></script>

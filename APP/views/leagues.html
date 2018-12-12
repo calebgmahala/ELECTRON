@@ -7,29 +7,32 @@
 	margin: auto;
 	margin-top: 20px;
 }
+.data {
+	width: 80%;
+	padding-left: 10%;
+	padding-right: 10%; 
+}
 </style>
 <body>
 	{{> _header}}
-	<div class="body">
-		<h1 class="title">{{title}}</h1>
-		<table class="table">
-			<tr>
-				<th>Id</th>
-				<th>Name</th>
-				<th>Owner_Id</th>
-				<th>entry_fee</th>
-				<th>Description</th>
-			</tr>
-			{{#leagues}}
+	<div class="body_user">
+		<div class="data">
+			<h1 class="title">{{title}}</h1>
+			<table class="table">
 				<tr>
-					<td>{{id}}</td>
-					<td><a href='/league/{{id}}'>{{name}}</td>
-					<td><a href='/user/{{owner_id}}'>{{owner_id}}</a></td>
-					<td>${{entry_fee}}</td>
-					<td>{{description}}</td>
+					<th>Name</th>
+					<th>entry_fee</th>
+					<th>Description</th>
 				</tr>
-			{{/leagues}}
-		</table>
+				{{#leagues}}
+					<tr>
+						<td><a href='/league/{{id}}'>{{name}}</a></td>
+						<td>${{entry_fee}}</td>
+						<td>{{description}}</td>
+					</tr>
+				{{/leagues}}
+			</table>
+		</div>
 	</div>
 </body>
 </html>
